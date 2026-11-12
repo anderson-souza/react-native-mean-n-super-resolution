@@ -143,7 +143,7 @@ T12 → T13
 
 **Tests**: unit · **Gate**: quick (native)
 **Commit**: `feat(native): add error codes and path utilities`
-**Status**: ✅ Done (see commit `feat(native): add error codes and path utilities`)
+**Status**: ✅ Done (304567e)
 
 ---
 
@@ -160,6 +160,7 @@ T12 → T13
 
 **Tests**: unit · **Gate**: quick (native)
 **Commit**: `feat(native): validate super-resolution requests`
+**Status**: ✅ Done (see commit `feat(native): validate super-resolution requests`)
 
 ---
 
