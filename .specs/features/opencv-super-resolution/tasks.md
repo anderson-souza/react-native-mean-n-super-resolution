@@ -82,6 +82,7 @@ T12 → T13
 
 **Tests**: none (tooling) · **Gate**: build (lint/typecheck/test)
 **Commit**: `chore: restore yarn 4 package manager`
+**Status**: ✅ Done (see commit `chore: restore yarn 4 package manager`)
 
 ---
 
