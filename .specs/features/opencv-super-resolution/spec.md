@@ -165,8 +165,8 @@ The library promises multi-frame super resolution with OpenCV but ships only the
 | SR-CORE-04 | P1 Super-resolve: alignment applied (PSNR) | Tasks | In Tasks |
 | SR-CORE-05 | P1 Super-resolve: non-blocking JS thread | Tasks | In Tasks |
 | SR-CORE-06 | P1 Super-resolve: iOS + Android parity | Tasks | In Tasks |
-| SR-CORE-07 | P1 Super-resolve: default temp output, unique, concurrent | Tasks | In Tasks |
-| SR-ERR-01 | P1 Errors: paths validation | Tasks | In Tasks |
+| SR-CORE-07 | P1 Super-resolve: default temp output, unique, concurrent | Tasks | Implementing |
+| SR-ERR-01 | P1 Errors: paths validation | Tasks | Implementing |
 | SR-ERR-02 | P1 Errors: scale validation | Tasks | In Tasks |
 | SR-ERR-03 | P1 Errors: outputPath extension validation | Tasks | In Tasks |
 | SR-ERR-04 | P1 Errors: decode failure + index | Tasks | In Tasks |

@@ -126,7 +126,7 @@ T12 → T13
 
 **Tests**: unit (smoke) · **Gate**: quick (native)
 **Commit**: `build(native): add opencv-mobile fetch helper and host test harness`
-**Status**: ✅ Done (see commit `build(native): add opencv-mobile fetch helper and host test harness`)
+**Status**: ✅ Done (ba7dddf)
 
 ---
 
@@ -143,6 +143,7 @@ T12 → T13
 
 **Tests**: unit · **Gate**: quick (native)
 **Commit**: `feat(native): add error codes and path utilities`
+**Status**: ✅ Done (see commit `feat(native): add error codes and path utilities`)
 
 ---
 

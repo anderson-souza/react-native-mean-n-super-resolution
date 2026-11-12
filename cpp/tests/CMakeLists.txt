@@ -21,10 +21,18 @@ FetchContent_MakeAvailable(googletest)
 
 enable_testing()
 
+set(SR_DIR ${CMAKE_CURRENT_LIST_DIR}/../sr)
+add_library(sr_core STATIC
+  ${SR_DIR}/Paths.cpp
+)
+target_include_directories(sr_core PUBLIC ${SR_DIR})
+target_link_libraries(sr_core PUBLIC ${OpenCV_LIBS})
+
 add_executable(sr_tests
   smoke_test.cpp
+  paths_test.cpp
 )
-target_link_libraries(sr_tests PRIVATE GTest::gtest_main ${OpenCV_LIBS})
+target_link_libraries(sr_tests PRIVATE sr_core GTest::gtest_main)
 
 include(GoogleTest)
 gtest_discover_tests(sr_tests)
