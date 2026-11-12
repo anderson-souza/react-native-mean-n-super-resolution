@@ -38,6 +38,7 @@
     "typecheck": "tsc",
     "lint": "eslint \"**/*.{js,ts,tsx}\"",
     "test": "jest",
+    "test:native": "node scripts/test-native.mjs",
     "release": "release-it --only-version"
   },
   "keywords": [

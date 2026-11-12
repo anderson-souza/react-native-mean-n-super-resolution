@@ -104,7 +104,7 @@ T12 → T13
 
 **Tests**: none (config) · **Gate**: evidence in Spike Results
 **Commit**: `chore(opencv): pin opencv-mobile version and checksums`
-**Status**: ✅ Done (see commit `chore(opencv): pin opencv-mobile version and checksums`)
+**Status**: ✅ Done (83dd1a6)
 
 ---
 
@@ -126,6 +126,7 @@ T12 → T13
 
 **Tests**: unit (smoke) · **Gate**: quick (native)
 **Commit**: `build(native): add opencv-mobile fetch helper and host test harness`
+**Status**: ✅ Done (see commit `build(native): add opencv-mobile fetch helper and host test harness`)
 
 ---
 
