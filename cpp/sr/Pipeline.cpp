@@ -1,5 +1,6 @@
 #include "Pipeline.h"
 
+#include "Align.h"
 #include "Errors.h"
 #include "Paths.h"
 
@@ -62,23 +63,33 @@ Result run(const Request& request) {
 
   cv::Size refSize;
   cv::Size outSize;
+  cv::Mat refGray;
   cv::Mat acc;
   int framesUsed = 0;
 
-  // invariant: one decoded frame alive at a time; only the accumulator persists.
+  // invariant: one decoded frame alive at a time; only refGray and the accumulator persist.
   for (size_t i = 0; i < request.paths.size(); ++i) {
     const cv::Mat frame = decodeFrame(request.paths[i], i);
     if (i == 0) {
       refSize = frame.size();
       outSize = cv::Size(request.scale * refSize.width, request.scale * refSize.height);
       acc = cv::Mat::zeros(outSize, CV_32FC3);
+      cv::cvtColor(frame, refGray, cv::COLOR_BGR2GRAY);
     } else if (frame.size() != refSize) {
       throw SrError(code::SizeMismatch, "index=" + std::to_string(i) + " is " +
                                             sizeText(frame.size()) + ", expected " +
                                             sizeText(refSize));
     }
 
+    // invariant: the reference is never estimated or skipped; it always uses A = I.
     cv::Mat A = cv::Mat::eye(2, 3, CV_64F);
+    if (i > 0) {
+      cv::Mat gray;
+      cv::cvtColor(frame, gray, cv::COLOR_BGR2GRAY);
+      bool aligned = false;
+      A = estimateTransform(refGray, gray, aligned);
+      if (!aligned) continue;
+    }
     const cv::Mat M = s * A;
 
     cv::Mat warped;

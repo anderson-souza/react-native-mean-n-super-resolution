@@ -289,3 +289,19 @@ T1 spike, 2026-11-11. Evidence was collected from the downloaded archives (heade
 - **Windows (vs2022):** `opencv-mobile-4.14.0-windows-vs2022/x64/OpenCVConfig.cmake`. It dispatches to `x64/vc17/staticlib/`, with static libs named `opencv_<module>4140.lib`.
 - **Linux (ubuntu-2404):** `opencv-mobile-4.14.0-ubuntu-2404/lib/cmake/opencv4/OpenCVConfig.cmake`, with static `lib/libopencv_*.a`.
 - **macOS:** `opencv2.framework/` at the archive root.
+
+### Addendum (T6): C++ exceptions are disabled in opencv-mobile
+
+- **Finding:** opencv-mobile builds OpenCV with C++ exceptions and RTTI disabled. Evidence:
+  - README v38: "C++ RTTI and exceptions are disabled for minimal build on mobile platforms".
+  - `.github/workflows/release.yml:371`: `-DANDROID_CPP_FEATURES="no-rtti no-exceptions"`.
+  - Lines 575-576 and others: `-fno-rtti -fno-exceptions`.
+  - Reproduced on the Windows host package: a `findTransformECC` call on an unrelated-noise frame (`CV_Error StsNoConv`) ended the test process with exit code 3 (`abort`). It did not throw `cv::Exception`.
+- **Consequence:** any `CV_Error`/`CV_Assert` inside OpenCV **terminates the process**. This includes allocation failure in `cv::Mat::create`, which goes through `CV_Error(OutOfMemory)`. `try/catch (cv::Exception&)` can never fire.
+- **Decision (T6), SPEC_DEVIATION from step 2:** alignment is **translation-only**:
+  1. `phaseCorrelate` with a Hanning window, on the ≤1024-px level, with the shift scaled by `1/d`.
+  2. The frame is accepted when the normalized cross-correlation of `ref(x)` vs `frame(x + shift)` over the overlap is ≥ 0.85. The overlap must be ≥ 25 % of the frame, and neither side may be flat. Otherwise the frame is skipped (SR-ERR-06).
+  3. Bit-identical frames are accepted with `A = I` directly.
+  - This is the fallback the risk table names for a missing `video` module. All SR-CORE-04 ACs use translations, so the spec is still met. Rotation between frames is not compensated.
+- **Hazard:** `cv::phaseCorrelate(src1, src2, window)` multiplies its inputs by the window **in place** when they already have DFT-optimal sizes. Callers must pass copies; without them the follow-up correlation (and, earlier, ECC) saw windowed images.
+- **Impact on later tasks (T8, SR-ERR-08, large-frame edge case):** `E_INTERNAL` can only come from exceptions our own code throws (`std::bad_alloc` from std containers, `SrError`, `std::exception`). OOM or invalid arguments inside OpenCV abort instead. Validating inputs before calling OpenCV is the only way to avoid aborts; a pre-flight memory budget check would be needed to honor "reject with `E_INTERNAL` on OOM". That needs an owner decision.

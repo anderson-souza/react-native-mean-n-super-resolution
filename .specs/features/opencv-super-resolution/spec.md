@@ -162,7 +162,7 @@ The library promises multi-frame super resolution with OpenCV but ships only the
 | SR-CORE-01 | P1 Super-resolve: result shape + file exists | Tasks | Implementing |
 | SR-CORE-02 | P1 Super-resolve: default scale 2 dimensions | Tasks | Implementing |
 | SR-CORE-03 | P1 Super-resolve: identical frames identity | Tasks | Implementing |
-| SR-CORE-04 | P1 Super-resolve: alignment applied (PSNR) | Tasks | In Tasks |
+| SR-CORE-04 | P1 Super-resolve: alignment applied (PSNR) | Tasks | Implementing |
 | SR-CORE-05 | P1 Super-resolve: non-blocking JS thread | Tasks | In Tasks |
 | SR-CORE-06 | P1 Super-resolve: iOS + Android parity | Tasks | In Tasks |
 | SR-CORE-07 | P1 Super-resolve: default temp output, unique, concurrent | Tasks | Implementing |
@@ -171,7 +171,7 @@ The library promises multi-frame super resolution with OpenCV but ships only the
 | SR-ERR-03 | P1 Errors: outputPath extension validation | Tasks | Implementing |
 | SR-ERR-04 | P1 Errors: decode failure + index | Tasks | Implementing |
 | SR-ERR-05 | P1 Errors: size mismatch + index | Tasks | Implementing |
-| SR-ERR-06 | P1 Errors: alignment failure / frame skip | Tasks | In Tasks |
+| SR-ERR-06 | P1 Errors: alignment failure / frame skip | Tasks | Implementing |
 | SR-ERR-07 | P1 Errors: write failure | Tasks | Implementing |
 | SR-ERR-08 | P1 Errors: internal exception, no crash | Tasks | In Tasks |
 | SR-ERR-09 | P1 Errors: web unsupported | Tasks | In Tasks |
