@@ -85,7 +85,12 @@ std::string toFileUri(const std::string& fsPath) {
 }
 
 std::string lowerExt(const std::string& path) {
-  std::string ext = std::filesystem::path(path).extension().string();
+  // why: plain string logic; std::filesystem parses URIs like "file://C:%5C.." differently per OS.
+  const auto sep = path.find_last_of("/\\");
+  const auto nameStart = sep == std::string::npos ? 0 : sep + 1;
+  const auto dot = path.rfind('.');
+  if (dot == std::string::npos || dot <= nameStart) return "";
+  std::string ext = path.substr(dot);
   for (auto& ch : ext) ch = static_cast<char>(std::tolower(static_cast<unsigned char>(ch)));
   return ext;
 }

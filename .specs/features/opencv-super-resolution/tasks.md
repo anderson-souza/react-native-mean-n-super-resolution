@@ -160,7 +160,7 @@ T12 → T13
 
 **Tests**: unit · **Gate**: quick (native)
 **Commit**: `feat(native): validate super-resolution requests`
-**Status**: ✅ Done (see commit `feat(native): validate super-resolution requests`)
+**Status**: ✅ Done (b79d2c7)
 
 ---
 
@@ -177,6 +177,7 @@ T12 → T13
 
 **Tests**: unit · **Gate**: quick (native)
 **Commit**: `feat(native): implement mean-of-N upscale pipeline`
+**Status**: ✅ Done (see commit `feat(native): implement mean-of-N upscale pipeline`)
 
 ---
 

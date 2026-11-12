@@ -159,9 +159,9 @@ The library promises multi-frame super resolution with OpenCV but ships only the
 
 | Requirement ID | Story | Phase | Status |
 | -------------- | ----- | ----- | ------ |
-| SR-CORE-01 | P1 Super-resolve: result shape + file exists | Tasks | In Tasks |
-| SR-CORE-02 | P1 Super-resolve: default scale 2 dimensions | Tasks | In Tasks |
-| SR-CORE-03 | P1 Super-resolve: identical frames identity | Tasks | In Tasks |
+| SR-CORE-01 | P1 Super-resolve: result shape + file exists | Tasks | Implementing |
+| SR-CORE-02 | P1 Super-resolve: default scale 2 dimensions | Tasks | Implementing |
+| SR-CORE-03 | P1 Super-resolve: identical frames identity | Tasks | Implementing |
 | SR-CORE-04 | P1 Super-resolve: alignment applied (PSNR) | Tasks | In Tasks |
 | SR-CORE-05 | P1 Super-resolve: non-blocking JS thread | Tasks | In Tasks |
 | SR-CORE-06 | P1 Super-resolve: iOS + Android parity | Tasks | In Tasks |
@@ -169,15 +169,15 @@ The library promises multi-frame super resolution with OpenCV but ships only the
 | SR-ERR-01 | P1 Errors: paths validation | Tasks | Implementing |
 | SR-ERR-02 | P1 Errors: scale validation | Tasks | Implementing |
 | SR-ERR-03 | P1 Errors: outputPath extension validation | Tasks | Implementing |
-| SR-ERR-04 | P1 Errors: decode failure + index | Tasks | In Tasks |
-| SR-ERR-05 | P1 Errors: size mismatch + index | Tasks | In Tasks |
+| SR-ERR-04 | P1 Errors: decode failure + index | Tasks | Implementing |
+| SR-ERR-05 | P1 Errors: size mismatch + index | Tasks | Implementing |
 | SR-ERR-06 | P1 Errors: alignment failure / frame skip | Tasks | In Tasks |
-| SR-ERR-07 | P1 Errors: write failure | Tasks | In Tasks |
+| SR-ERR-07 | P1 Errors: write failure | Tasks | Implementing |
 | SR-ERR-08 | P1 Errors: internal exception, no crash | Tasks | In Tasks |
 | SR-ERR-09 | P1 Errors: web unsupported | Tasks | In Tasks |
-| SR-CFG-01 | P2 Configure: scale 1–4 | Tasks | In Tasks |
-| SR-CFG-02 | P2 Configure: outputPath honored/overwrite | Tasks | In Tasks |
-| SR-CFG-03 | P2 Configure: format by extension | Tasks | In Tasks |
+| SR-CFG-01 | P2 Configure: scale 1–4 | Tasks | Implementing |
+| SR-CFG-02 | P2 Configure: outputPath honored/overwrite | Tasks | Implementing |
+| SR-CFG-03 | P2 Configure: format by extension | Tasks | Implementing |
 | SR-DOC-01 | P2 Docs: exported types, no multiply | Tasks | In Tasks |
 | SR-DOC-02 | P2 Docs: README | Tasks | In Tasks |
 
