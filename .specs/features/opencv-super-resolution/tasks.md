@@ -194,7 +194,7 @@ T12 → T13
 
 **Tests**: unit · **Gate**: quick (native) + Build gate (end of Phase 2)
 **Commit**: `feat(native): align frames before averaging`
-**Status**: ✅ Done (see commit `feat(native): align frames before averaging`) — SPEC_DEVIATION: translation-only phaseCorrelate + NCC gate (ECC aborts: opencv-mobile has no C++ exceptions; see design.md Spike Results addendum)
+**Status**: ✅ Done (39026ac) — SPEC_DEVIATION: translation-only phaseCorrelate + NCC gate (ECC aborts: opencv-mobile has no C++ exceptions; see design.md Spike Results addendum)
 
 ---
 
