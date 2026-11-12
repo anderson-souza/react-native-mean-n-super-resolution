@@ -8,6 +8,7 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 
+#include <cmath>
 #include <fstream>
 #include <string>
 #include <vector>
@@ -22,9 +23,14 @@ std::string sizeText(const cv::Size& s) {
 cv::Mat decodeFrame(const std::string& pathOrUri, size_t index) {
   const std::string fsPath = toFsPath(pathOrUri);
   cv::Mat img = cv::imread(fsPath, cv::IMREAD_COLOR);
-  if (img.empty()) {
+  if (img.empty() || img.cols <= 0 || img.rows <= 0) {
     throw SrError(code::DecodeFailed,
                   "index=" + std::to_string(index) + " could not decode image: " + fsPath);
+  }
+  // invariant: every later OpenCV call assumes 8-bit BGR (AD-004: asserts abort).
+  if (img.type() != CV_8UC3) {
+    throw SrError(code::Internal, "index=" + std::to_string(index) +
+                                      " decoded to unexpected type " + std::to_string(img.type()));
   }
   return img;
 }
@@ -37,13 +43,9 @@ void encodeTo(const std::string& fsPath, const cv::Mat& img) {
   if (ext == ".jpg" || ext == ".jpeg") params = {cv::IMWRITE_JPEG_QUALITY, 95};
 
   std::vector<uchar> bytes;
-  bool encoded = false;
-  try {
-    encoded = cv::imencode(ext, img, bytes, params);
-  } catch (const cv::Exception& e) {
-    throw SrError(code::WriteFailed, "could not encode " + ext + ": " + e.what());
+  if (!cv::imencode(ext, img, bytes, params)) {
+    throw SrError(code::WriteFailed, "could not encode " + ext);
   }
-  if (!encoded) throw SrError(code::WriteFailed, "could not encode " + ext);
 
   std::ofstream out(fsPath, std::ios::binary | std::ios::trunc);
   if (!out) throw SrError(code::WriteFailed, "could not open for writing: " + fsPath);
@@ -52,7 +54,22 @@ void encodeTo(const std::string& fsPath, const cv::Mat& img) {
   if (!out) throw SrError(code::WriteFailed, "could not write: " + fsPath);
 }
 
+bool isFinite(const cv::Mat& m) {
+  for (int r = 0; r < m.rows; ++r) {
+    for (int c = 0; c < m.cols; ++c) {
+      if (!std::isfinite(m.at<double>(r, c))) return false;
+    }
+  }
+  return true;
+}
+
 }  // namespace
+
+std::uint64_t estimatePeakBytes(int width, int height, int scale) {
+  const std::uint64_t px = static_cast<std::uint64_t>(width) * static_cast<std::uint64_t>(height);
+  const std::uint64_t s2 = static_cast<std::uint64_t>(scale) * static_cast<std::uint64_t>(scale);
+  return s2 * px * (3 * 4 + 3) + 3 * px + 2 * px;
+}
 
 Result run(const Request& request) {
   validate(request);
@@ -71,6 +88,12 @@ Result run(const Request& request) {
   for (size_t i = 0; i < request.paths.size(); ++i) {
     const cv::Mat frame = decodeFrame(request.paths[i], i);
     if (i == 0) {
+      const std::uint64_t peak = estimatePeakBytes(frame.cols, frame.rows, request.scale);
+      if (peak > kMemoryBudgetBytes) {
+        throw SrError(code::Internal, "estimated memory " + std::to_string(peak >> 20) +
+                                          " MiB exceeds budget of " +
+                                          std::to_string(kMemoryBudgetBytes >> 20) + " MiB");
+      }
       refSize = frame.size();
       outSize = cv::Size(request.scale * refSize.width, request.scale * refSize.height);
       acc = cv::Mat::zeros(outSize, CV_32FC3);
@@ -88,7 +111,7 @@ Result run(const Request& request) {
       cv::cvtColor(frame, gray, cv::COLOR_BGR2GRAY);
       bool aligned = false;
       A = estimateTransform(refGray, gray, aligned);
-      if (!aligned) continue;
+      if (!aligned || !isFinite(A)) continue;
     }
     const cv::Mat M = s * A;
 

@@ -245,3 +245,55 @@ TEST(Pipeline, ConcurrentDefaultOutputsAreDistinctJpegsInTempDir) {
     fs::remove(p);
   }
 }
+
+TEST(PipelinePreflight, EstimatePeakBytesMatchesFormula) {
+  // invariant: s^2*w*h*(3*4 + 3) output buffers + 3*w*h frame + 2*w*h gray working set.
+  EXPECT_EQ(sr::estimatePeakBytes(100, 50, 2), 325000u);
+  EXPECT_EQ(sr::estimatePeakBytes(2304, 2048, 4), 1156055040u);
+  EXPECT_EQ(sr::estimatePeakBytes(2304, 2048, 1), 94371840u);
+}
+
+TEST(PipelinePreflight, OverBudgetReferenceRejectsInternalWithoutOutput) {
+  constexpr int w = 2304, h = 2048;
+  ASSERT_GT(sr::estimatePeakBytes(w, h, 4), sr::kMemoryBudgetBytes);
+  const auto dir = fixtures::freshDir();
+  const auto big = fixtures::writePng(dir, "big.png", fixtures::texturedImage(w, h));
+  auto r = requestFor(std::vector<std::string>(5, big), dir);
+  r.scale = 4;
+  r.outputPath = (dir / "out.jpg").string();
+
+  const auto e = runExpectingError(r);
+
+  EXPECT_EQ(e.code, "E_INTERNAL");
+  EXPECT_NE(e.message.find("exceeds budget"), std::string::npos) << e.message;
+  EXPECT_FALSE(fs::exists(*r.outputPath));
+}
+
+TEST(PipelinePreflight, SameLargeFramesAtScaleOneResolve) {
+  constexpr int w = 2304, h = 2048;
+  const auto dir = fixtures::freshDir();
+  const auto big = fixtures::writePng(dir, "big.png", fixtures::texturedImage(w, h));
+  auto r = requestFor(std::vector<std::string>(5, big), dir);
+  r.scale = 1;
+  r.outputPath = (dir / "out.jpg").string();
+
+  const sr::Result res = sr::run(r);
+
+  EXPECT_EQ(res.width, w);
+  EXPECT_EQ(res.height, h);
+  EXPECT_EQ(res.framesUsed, 5);
+  EXPECT_TRUE(fs::exists(*r.outputPath));
+}
+
+TEST(PipelinePreflight, DegenerateOneRowFramesRejectInsteadOfAborting) {
+  // why: OpenCV asserts abort the process (AD-004); 1-px-high frames would reach
+  // createHanningWindow's size assert without a guard.
+  const auto dir = fixtures::freshDir();
+  std::vector<std::string> paths;
+  for (int i = 0; i < 5; ++i) {
+    paths.push_back(fixtures::writePng(dir, "row" + std::to_string(i) + ".png",
+                                       fixtures::texturedImage(64, 1, 100 + i)));
+  }
+  const auto e = runExpectingError(requestFor(paths, dir));
+  EXPECT_EQ(e.code, "E_ALIGNMENT_FAILED");
+}

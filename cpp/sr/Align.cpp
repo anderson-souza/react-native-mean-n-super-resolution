@@ -72,6 +72,8 @@ cv::Mat estimateTransform(const cv::Mat& refGray, const cv::Mat& gray, bool& ok)
 
   const int longSide = std::max(refGray.cols, refGray.rows);
   const double d = longSide > kMaxAlignSide ? static_cast<double>(kMaxAlignSide) / longSide : 1.0;
+  // invariant: createHanningWindow/phaseCorrelate assert on sides < 2 (AD-004: abort).
+  if (std::lround(refGray.cols * d) < 2 || std::lround(refGray.rows * d) < 2) return identity;
   const cv::Mat ref = toAlignLevel(refGray, d);
   const cv::Mat cur = toAlignLevel(gray, d);
 
