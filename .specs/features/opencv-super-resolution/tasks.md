@@ -82,7 +82,7 @@ T12 → T13
 
 **Tests**: none (tooling) · **Gate**: build (lint/typecheck/test)
 **Commit**: `chore: restore yarn 4 package manager`
-**Status**: ✅ Done (see commit `chore: restore yarn 4 package manager`)
+**Status**: ✅ Done (13477a1)
 
 ---
 
@@ -104,6 +104,7 @@ T12 → T13
 
 **Tests**: none (config) · **Gate**: evidence in Spike Results
 **Commit**: `chore(opencv): pin opencv-mobile version and checksums`
+**Status**: ✅ Done (see commit `chore(opencv): pin opencv-mobile version and checksums`)
 
 ---
 

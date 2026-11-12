@@ -234,3 +234,58 @@ Error message format: `"<CODE>: <detail>"`. Detail includes `index=<i>` for deco
 | Async | `AsyncPromise` + detached `std::thread` per call | RN-provided thread-safe settlement; no pool needed for v1 |
 | Optional options | JS passes `{}`; native arg required | Avoids optional-object codegen edge case |
 | Validation | Duplicated in JS (Jest-tested) and C++ (gtest) | JS gives fast tests; C++ guards direct callers |
+
+---
+
+## Spike Results
+
+T1 spike, 2026-11-11. Evidence was collected from the downloaded archives (headers, `llvm-nm` from NDK 30.0.14904198) and from opencv-mobile's `highgui/src/highgui.cpp` at tag `v38`.
+
+### Version pinned
+
+- Release **v38** (published 2026-11-10), the latest. OpenCV **4.14.0**, which is the newest 4.x the release ships (it also ships 5.x; not used).
+- `opencv.json` packages: `android`, `apple`, `windows` (`windows-vs2022`), `linux` (`ubuntu-2404`, matching CI `ubuntu-latest`), `macos`.
+- Each `sha256` came from `sha256sum` over the downloaded file, and each one equals the GitHub asset `digest` field (`gh api repos/nihui/opencv-mobile/releases/tags/v38`):
+
+| key | sha256 (computed) |
+| --- | --- |
+| android | `2169b7cf49dcd8c314ea99efaa8106ce5de282ab01835cf34df08ed133cbbc9f` |
+| apple | `921d6dcff419f55ff0073c7fd092aa567877ff96715d7145772f2efb8100ab25` |
+| windows | `607c71d64f7b65a4a14465e02429f7fecbf57a331c053c4d46184e0852e12c6c` |
+| linux | `62409b7834840e3c6f447f25abf8ca9e05eae121e71abe458b1200f22ff97bd5` |
+| macos | `df7b762956f94362f2747413ae29641151f41b850e5d7965fabbacb6fb4e2d59` |
+
+### Modules
+
+- `opencv2/opencv_modules.hpp` defines: `HAVE_OPENCV_CORE`, `FEATURES2D`, `HIGHGUI`, `IMGPROC`, `PHOTO`, `VIDEO`.
+- **`video` is present**, so the design runs as written: phaseCorrelate init followed by ECC. No phaseCorrelate-only fallback is needed.
+- There is **no `imgcodecs` module**. `imread`/`imwrite`/`imencode`/`imdecode` are declared in `opencv2/highgui/highgui.hpp`, so include `<opencv2/highgui.hpp>`.
+
+| API | Header evidence | Library symbol (`llvm-nm -C --defined-only`) |
+| --- | --- | --- |
+| `findTransformECC` | `video/tracking.hpp:365` | `T cv::findTransformECC(..., cv::TermCriteria, cv::_InputArray const&, int)` in `libopencv_video.a` (ubuntu-2404 and android arm64-v8a) |
+| `phaseCorrelate` | `imgproc.hpp:3053` | `T cv::phaseCorrelate(...)` in `libopencv_imgproc.a` |
+| `warpAffine` | `imgproc.hpp:2481` | `T cv::warpAffine(...)` in `libopencv_imgproc.a` |
+| `imread` / `imwrite` / `imencode` / `imdecode` | `highgui/highgui.hpp:62-68` | `T cv::imread`, `T cv::imwrite`, `T cv::imencode`, `T cv::imdecode` in `libopencv_highgui.a` |
+
+### Image codecs (highgui.cpp @ v38)
+
+- stb_image is built with `STBI_ONLY_JPEG`, `STBI_ONLY_PNG`, `STBI_ONLY_BMP` and `STBI_ONLY_PNM` (lines 34-37). Decode therefore supports JPEG, PNG, BMP and PNM.
+- `imread(..., IMREAD_COLOR)` asks stb for 3 channels (lines 133-135), so grayscale and alpha inputs come back as 8-bit BGR.
+- `imwrite` and `imencode` support JPEG (`stbi_write_jpg`; the `IMWRITE_JPEG_QUALITY` param is honored and defaults to 95; lines 537-549) and PNG (`stbi_write_png`, lines 550-553).
+- **Hazard:** extension matching is an exact string compare against `.jpg`, `.jpeg`, `.JPG`, `.JPEG`, `.png` and `.PNG`. A mixed-case extension such as `.Jpg` makes `imwrite` return false.
+  - **Decision for the pipeline:** encode with `cv::imencode(lowerExt(outputPath), ...)` and write the bytes with `std::ofstream`. Any open/write failure maps to `E_WRITE_FAILED`. This keeps the spec's case-insensitive extension rule (SR-ERR-03, SR-CFG-03).
+- `imread` opens files with narrow `fopen` and prints to `stderr` on failure. UTF-8 paths work on Android and iOS.
+
+### EXIF orientation
+
+- **Applied.** After decoding, `imread` parses EXIF and calls `rotate_by_orientation` for orientation 1-8 (`highgui.cpp` lines 284-296; `imdecode` does the same at lines 707-718).
+- The spec edge case ("orientation applied consistently to all frames") holds as written, so no spec amendment is needed.
+
+### Archive layout
+
+- **Android:** `opencv-mobile-4.14.0-android/sdk/native/jni/OpenCVConfig.cmake`. It dispatches by ABI to `jni/abi-<ABI>/OpenCVConfig.cmake` via `ANDROID_NDK_ABI_NAME`. Static libs live in `sdk/native/staticlibs/<ABI>/` for arm64-v8a, armeabi-v7a, x86 and x86_64; arm64 also gets `3rdparty/libs/arm64-v8a/libkleidicv*.a`.
+- **Apple:** `opencv2.xcframework/` at the archive root, with slices `ios-arm64` and `ios-arm64_x86_64-simulator` (plus macOS, catalyst, tvOS, watchOS and visionOS). Headers are at `opencv2.framework/Versions/A/Headers/` (`video/tracking.hpp` is present).
+- **Windows (vs2022):** `opencv-mobile-4.14.0-windows-vs2022/x64/OpenCVConfig.cmake`. It dispatches to `x64/vc17/staticlib/`, with static libs named `opencv_<module>4140.lib`.
+- **Linux (ubuntu-2404):** `opencv-mobile-4.14.0-ubuntu-2404/lib/cmake/opencv4/OpenCVConfig.cmake`, with static `lib/libopencv_*.a`.
+- **macOS:** `opencv2.framework/` at the archive root.

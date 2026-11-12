@@ -1,0 +1,26 @@
+{
+  "version": "4.14.0",
+  "release": "v38",
+  "packages": {
+    "android": {
+      "url": "https://github.com/nihui/opencv-mobile/releases/download/v38/opencv-mobile-4.14.0-android.zip",
+      "sha256": "2169b7cf49dcd8c314ea99efaa8106ce5de282ab01835cf34df08ed133cbbc9f"
+    },
+    "apple": {
+      "url": "https://github.com/nihui/opencv-mobile/releases/download/v38/opencv-mobile-4.14.0-apple.zip",
+      "sha256": "921d6dcff419f55ff0073c7fd092aa567877ff96715d7145772f2efb8100ab25"
+    },
+    "windows": {
+      "url": "https://github.com/nihui/opencv-mobile/releases/download/v38/opencv-mobile-4.14.0-windows-vs2022.zip",
+      "sha256": "607c71d64f7b65a4a14465e02429f7fecbf57a331c053c4d46184e0852e12c6c"
+    },
+    "linux": {
+      "url": "https://github.com/nihui/opencv-mobile/releases/download/v38/opencv-mobile-4.14.0-ubuntu-2404.zip",
+      "sha256": "62409b7834840e3c6f447f25abf8ca9e05eae121e71abe458b1200f22ff97bd5"
+    },
+    "macos": {
+      "url": "https://github.com/nihui/opencv-mobile/releases/download/v38/opencv-mobile-4.14.0-macos.zip",
+      "sha256": "df7b762956f94362f2747413ae29641151f41b850e5d7965fabbacb6fb4e2d59"
+    }
+  }
+}
