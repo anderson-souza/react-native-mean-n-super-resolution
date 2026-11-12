@@ -1,12 +1,9 @@
 import { Text, View, StyleSheet } from 'react-native';
-import { multiply } from 'react-native-mean-n-super-resolution';
-
-const result = multiply(3, 7);
 
 export default function App() {
   return (
     <View style={styles.container}>
-      <Text>Result: {result}</Text>
+      <Text>superResolve demo</Text>
     </View>
   );
 }
