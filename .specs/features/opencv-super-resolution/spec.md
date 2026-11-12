@@ -47,6 +47,7 @@ The library promises multi-frame super resolution with OpenCV but ships only the
 | Determinism | Same inputs + options SHALL produce byte-identical output on the same device/build | Makes behavior testable and debuggable | y |
 | Overwriting `outputPath` | If file exists it is overwritten | Caller explicitly chose the path | y |
 | Native behavior verification | JS wrapper covered by Jest (native module mocked); native pipeline verified by a C++ host test target and/or the example app on device with bundled sample frames — exact harness chosen in Design | No native test harness exists today | y |
+| OpenCV exceptions | opencv-mobile has no C++ exceptions: no ECC (phaseCorrelate translation-only alignment, rotation not compensated); OpenCV asserts abort the process, so every input is validated before OpenCV calls + 1 GiB memory pre-flight; residual crash risk documented in README | Owner decision 2026-11-11 (keep opencv-mobile + guards) | y |
 | Library size | OpenCV adds significant binary size; acceptable, but only modules needed (core, imgproc, imgcodecs, video) are linked where the distribution allows | Unavoidable for OpenCV | y |
 
 **Open questions:** none — all resolved or logged above (required before the spec is confirmed).
@@ -90,7 +91,7 @@ The library promises multi-frame super resolution with OpenCV but ships only the
 5. WHEN decoded frames do not all share `paths[0]`'s width×height THEN Promise SHALL reject with `E_SIZE_MISMATCH` and the message SHALL include the first mismatching index.
 6. WHEN alignment fails for so many frames that fewer than 2 frames (including reference) remain THEN Promise SHALL reject with `E_ALIGNMENT_FAILED`.
 7. WHEN the output file cannot be written (e.g. directory does not exist or is not writable) THEN Promise SHALL reject with `E_WRITE_FAILED`.
-8. WHEN any unexpected native exception occurs THEN Promise SHALL reject with `E_INTERNAL` and the app SHALL NOT crash.
+8. WHEN a C++ exception is thrown on the worker (`SrError` excluded, e.g. `std::bad_alloc`, `std::exception`) or the pre-flight memory estimate (accumulator + output + working frames) exceeds the 1 GiB budget THEN Promise SHALL reject with `E_INTERNAL` and the app SHALL NOT crash. *(Amended 2026-11-11, owner decision: opencv-mobile is built without exceptions, so OpenCV-internal assertion failures cannot be caught — they are prevented by pre-flight validation, not handled.)*
 9. WHEN called on web THEN `superResolve` SHALL reject (or throw) with the existing "only supported on native platforms" message.
 
 **Independent Test**: Jest tests for AC 1–3, 9 with native module mocked; native/example tests for AC 4–8 using a missing path, a text file, two different-size images, an unwritable output path.
@@ -135,7 +136,7 @@ The library promises multi-frame super resolution with OpenCV but ships only the
 - WHEN `scale = 1` THEN output dimensions SHALL equal input dimensions (align + mean only).
 - WHEN `file://` URI has percent-encoded characters (e.g. spaces `%20`) THEN system SHALL decode them before opening.
 - WHEN EXIF orientation is present THEN system SHALL apply OpenCV's default decode behavior (orientation applied) consistently to all frames.
-- WHEN frames are very large (e.g. 12 MP × 30 frames × scale 4) THEN system SHALL either complete or reject with `E_INTERNAL` (out of memory caught where possible) — never hang indefinitely.
+- WHEN frames are very large (e.g. 12 MP × 30 frames × scale 4) THEN system SHALL, after decoding the reference frame and before allocating the accumulator, estimate peak memory and reject with `E_INTERNAL` if it exceeds 1 GiB; otherwise complete — never hang indefinitely.
 
 ---
 

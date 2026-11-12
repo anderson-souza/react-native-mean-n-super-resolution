@@ -56,7 +56,7 @@ T3 → T4 → T5 → T6
 ### Phase 3: React Native integration
 
 ```
-T7 → T8 → T9 → T10 → T11
+T7 → T7b → T8 → T9 → T10 → T11
 ```
 
 ### Phase 4: Example + docs
@@ -214,11 +214,27 @@ T12 → T13
 
 ---
 
+### T7b: Pre-flight guards (no-exceptions OpenCV)
+
+**What**: In `sr::run`, before any OpenCV call that can assert: guard every input (non-empty Mat, type `CV_8UC3`, sizes > 0, scale in range, warp matrix finite) and, after decoding the reference frame, compute peak-memory estimate `s²·w·h·(3·4 + 3) + frame + gray working set`; > 1 GiB (`kMemoryBudgetBytes`) → `E_INTERNAL: estimated memory <N> MiB exceeds budget`. Remove dead `catch(cv::Exception)` in Pipeline.cpp.
+**Where**: `cpp/sr/Pipeline.cpp`, `cpp/sr/Pipeline.h` (budget constant + `estimatePeakBytes` exposed for tests), `cpp/tests/pipeline_test.cpp`
+**Depends on**: T7
+**Requirement**: SR-ERR-08 (amended), large-frame edge case
+
+**Done when**:
+- [ ] Tests: `estimatePeakBytes` exact value for a known w/h/s; request whose reference decodes to a size above budget at scale 4 (generate e.g. 4096×4096 PNG; s=4) → `E_INTERNAL` with `exceeds budget`, no output file written; same image at s=1 → resolves
+- [ ] `yarn test:native` passes; count = previous + new
+
+**Tests**: unit · **Gate**: quick (native)
+**Commit**: `feat(native): add pre-flight memory and input guards`
+
+---
+
 ### T8: Error mapping + TurboModule async adapter
 
 **What**: `cpp/sr/ErrorMapping.{h,cpp}` — `std::string toRejectMessage(std::exception_ptr)` (SrError → `CODE: msg`; `cv::Exception`/`bad_alloc`/`std::exception`/unknown → `E_INTERNAL: …`); `MeanNSuperResolutionImpl::superResolve` using codegen structs + `AsyncPromise` + detached worker; remove `multiply`.
 **Where**: `cpp/sr/ErrorMapping.*`, `cpp/tests/error_mapping_test.cpp`, `cpp/MeanNSuperResolutionImpl.{h,cpp}`
-**Depends on**: T7
+**Depends on**: T7b
 **Requirement**: SR-ERR-08, SR-CORE-05 (async), SR-CORE-01
 
 **Done when**:
@@ -318,11 +334,11 @@ Phase 1 → Phase 2 → Phase 3 → Phase 4
 
 Phase 1:  T0 ──→ T1 ──→ T2
 Phase 2:  T3 ──→ T4 ──→ T5 ──→ T6
-Phase 3:  T7 ──→ T8 ──→ T9 ──→ T10 ──→ T11
+Phase 3:  T7 ──→ T7b ──→ T8 ──→ T9 ──→ T10 ──→ T11
 Phase 4:  T12 ──→ T13
 ```
 
-Batches (~7 tasks, whole phases): **Batch A** = Phase 1 + 2 (T0–T6, 7 tasks); **Batch B** = Phase 3 + 4 (T7–T13, 7 tasks).
+Batches (~7 tasks, whole phases): **Batch A** = Phase 1 + 2 (T0–T6, 7 tasks); **Batch B** = Phase 3 + 4 (T7–T13 incl. T7b, 8 tasks).
 
 ---
 
@@ -357,7 +373,8 @@ Batches (~7 tasks, whole phases): **Batch A** = Phase 1 + 2 (T0–T6, 7 tasks); 
 | T5 | T4 | T4→T5 | ✅ |
 | T6 | T5 | T5→T6 | ✅ |
 | T7 | T6 | P2→T7 | ✅ |
-| T8 | T7 | T7→T8 | ✅ |
+| T7b | T7 | T7→T7b | ✅ |
+| T8 | T7b | T7b→T8 | ✅ |
 | T9 | T8 | T8→T9 | ✅ |
 | T10 | T9 | T9→T10 | ✅ |
 | T11 | T10 | T10→T11 | ✅ |
@@ -376,6 +393,7 @@ Batches (~7 tasks, whole phases): **Batch A** = Phase 1 + 2 (T0–T6, 7 tasks); 
 | T5 | cpp/sr | unit | unit | ✅ |
 | T6 | cpp/sr | unit | unit | ✅ |
 | T7 | src | unit | unit | ✅ |
+| T7b | cpp/sr | unit | unit | ✅ |
 | T8 | cpp/sr + TM adapter | unit + build | unit + build | ✅ |
 | T9 | platform glue | build + UAT | build (UAT in T12) | ✅ |
 | T10 | platform glue | build + UAT | build (UAT: iOS gap, see design risk) | ✅ |

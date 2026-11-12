@@ -26,12 +26,21 @@
 - **Date**: 2026-11-11
 - **Status**: active
 
+### AD-004
+- **Decision**: Native code must never rely on catching `cv::Exception`: opencv-mobile is built with `-fno-exceptions`, so OpenCV assertion failures abort the process. Every OpenCV call is preceded by input guards (non-empty, expected type, positive sizes, finite matrices) and allocation-heavy steps by a memory pre-flight budget.
+- **Reason**: Owner chose to keep opencv-mobile (AD-002) rather than build/ship OpenCV with exceptions (2026-11-11).
+- **Trade-off**: No ECC (`findTransformECC` asserts internally) — alignment is translation-only; residual crash risk for unforeseen OpenCV asserts.
+- **Scope**: All native code calling OpenCV.
+- **Date**: 2026-11-11
+- **Status**: active
+
 ## Handoff
 
 - **Feature**: `.specs/features/opencv-super-resolution`
-- **Phase / Task**: Specify — confirmed 2026-11-11 (frame count = exactly 5, 15 or 30; other defaults accepted)
-- **Completed**: Specify; Design drafted (design.md, AD-002/AD-003) — awaiting user approval
-- **In-progress** (file:line): none
-- **Next step**: User approves design → Tasks breakdown (T1 = opencv-mobile spike).- **Blockers**: none
-- **Uncommitted files**: `package.json` (packageManager removed), `pnpm-lock.yaml`, `.tlc/`, `CLAUDE.md`, `.specs/`
-- **Branch**: main
+- **Phase / Task**: Execute — Batch B (T7–T13 incl. T7b)
+- **Completed**: Specify, Design (approved), Tasks (approved, T0–T13)
+- **In-progress** (file:line): Batch A done (13477a1..80b1a4c, 35 native tests); Batch B dispatched
+- **Next step**: On Batch B summary → owner decides on GitHub remote/push for CI evidence (T10/T11, iOS) → Verifier.
+- **Blockers**: none
+- **Uncommitted files**: none (.tlc/, .codegraph/ are untracked tooling)
+- **Branch**: feat/opencv-super-resolution
