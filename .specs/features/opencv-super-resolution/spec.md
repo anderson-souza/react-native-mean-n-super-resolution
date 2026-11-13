@@ -160,27 +160,27 @@ The library promises multi-frame super resolution with OpenCV but ships only the
 
 | Requirement ID | Story | Phase | Status |
 | -------------- | ----- | ----- | ------ |
-| SR-CORE-01 | P1 Super-resolve: result shape + file exists | Tasks | Implementing |
-| SR-CORE-02 | P1 Super-resolve: default scale 2 dimensions | Tasks | Implementing |
-| SR-CORE-03 | P1 Super-resolve: identical frames identity | Tasks | Implementing |
-| SR-CORE-04 | P1 Super-resolve: alignment applied (PSNR) | Tasks | Implementing |
-| SR-CORE-05 | P1 Super-resolve: non-blocking JS thread | Tasks | Implementing |
-| SR-CORE-06 | P1 Super-resolve: iOS + Android parity | Tasks | Implementing |
-| SR-CORE-07 | P1 Super-resolve: default temp output, unique, concurrent | Tasks | Implementing |
-| SR-ERR-01 | P1 Errors: paths validation | Tasks | Implementing |
-| SR-ERR-02 | P1 Errors: scale validation | Tasks | Implementing |
-| SR-ERR-03 | P1 Errors: outputPath extension validation | Tasks | Implementing |
-| SR-ERR-04 | P1 Errors: decode failure + index | Tasks | Implementing |
-| SR-ERR-05 | P1 Errors: size mismatch + index | Tasks | Implementing |
-| SR-ERR-06 | P1 Errors: alignment failure / frame skip | Tasks | Implementing |
-| SR-ERR-07 | P1 Errors: write failure | Tasks | Implementing |
-| SR-ERR-08 | P1 Errors: internal exception, no crash | Tasks | Implementing |
-| SR-ERR-09 | P1 Errors: web unsupported | Tasks | Implementing |
-| SR-CFG-01 | P2 Configure: scale 1–4 | Tasks | Implementing |
-| SR-CFG-02 | P2 Configure: outputPath honored/overwrite | Tasks | Implementing |
-| SR-CFG-03 | P2 Configure: format by extension | Tasks | Implementing |
-| SR-DOC-01 | P2 Docs: exported types, no multiply | Tasks | Implementing |
-| SR-DOC-02 | P2 Docs: README | Tasks | Implementing |
+| SR-CORE-01 | P1 Super-resolve: result shape + file exists | Execute | Verified |
+| SR-CORE-02 | P1 Super-resolve: default scale 2 dimensions | Execute | Verified |
+| SR-CORE-03 | P1 Super-resolve: identical frames identity | Execute | Verified |
+| SR-CORE-04 | P1 Super-resolve: alignment applied (PSNR) | Execute | Verified |
+| SR-CORE-05 | P1 Super-resolve: non-blocking JS thread | Execute | Verified |
+| SR-CORE-06 | P1 Super-resolve: iOS + Android parity | Execute | Verified (Android/host; iOS unverified) |
+| SR-CORE-07 | P1 Super-resolve: default temp output, unique, concurrent | Execute | Verified |
+| SR-ERR-01 | P1 Errors: paths validation | Execute | Verified |
+| SR-ERR-02 | P1 Errors: scale validation | Execute | Verified |
+| SR-ERR-03 | P1 Errors: outputPath extension validation | Execute | Verified |
+| SR-ERR-04 | P1 Errors: decode failure + index | Execute | Verified |
+| SR-ERR-05 | P1 Errors: size mismatch + index | Execute | Verified |
+| SR-ERR-06 | P1 Errors: alignment failure / frame skip | Execute | Verified |
+| SR-ERR-07 | P1 Errors: write failure | Execute | Verified |
+| SR-ERR-08 | P1 Errors: internal exception, no crash | Execute | Verified |
+| SR-ERR-09 | P1 Errors: web unsupported | Execute | Verified |
+| SR-CFG-01 | P2 Configure: scale 1–4 | Execute | Verified |
+| SR-CFG-02 | P2 Configure: outputPath honored/overwrite | Execute | Verified |
+| SR-CFG-03 | P2 Configure: format by extension | Execute | Verified |
+| SR-DOC-01 | P2 Docs: exported types, no multiply | Execute | Verified |
+| SR-DOC-02 | P2 Docs: README | Execute | Verified |
 
 **Coverage:** 21 total, 21 mapped to tasks (T1–T13), 0 unmapped
 

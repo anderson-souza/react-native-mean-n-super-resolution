@@ -45,10 +45,10 @@
 ## Handoff
 
 - **Feature**: `.specs/features/opencv-super-resolution`
-- **Phase / Task**: Execute — Batch B (T7–T13 incl. T7b)
-- **Completed**: Specify, Design (approved), Tasks (approved, T0–T13)
-- **In-progress** (file:line): T0–T13 committed (Batch B: c9993a9..82edeaf; T10/T11 partial — no remote); fix commits pending: NDK fail-fast CMake, CI NDK r30
-- **Next step**: Worker finishes NDK fix commits → owner decides GitHub remote/push for CI evidence (T10/T11, iOS) → Verifier sub-agent.
-- **Blockers**: none
-- **Uncommitted files**: none (.tlc/, .codegraph/ are untracked tooling)
+- **Phase / Task**: Done — validation PASS (iteration 2, conditional on owner-accepted gaps)
+- **Completed**: T0–T13 + T7b + fix iteration 1 (F1–F4); validation.md ff73d23
+- **In-progress** (file:line): none
+- **Next step**: Owner adds GitHub remote + pushes branch → confirm CI (test-native, build-android NDK r30, build-ios) → iOS device UAT on a Mac → open PR.
+- **Blockers**: none (open evidence gaps: CI never run, iOS build/runtime, EXIF test)
+- **Uncommitted files**: none
 - **Branch**: feat/opencv-super-resolution

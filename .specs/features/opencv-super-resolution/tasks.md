@@ -9,7 +9,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 ---
 
 **Design**: `.specs/features/opencv-super-resolution/design.md`
-**Status**: Approved (2026-11-11) — tools: context7, WebSearch/fetch, skills `react-native-expert`, `codenavi`; execution: sub-agent per batch
+**Status**: Done (2026-11-13; validation PASS conditional on iOS/CI gaps) — approved 2026-11-11 — tools: context7, WebSearch/fetch, skills `react-native-expert`, `codenavi`; execution: sub-agent per batch
 
 ---
 
