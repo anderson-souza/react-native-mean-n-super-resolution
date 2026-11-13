@@ -180,7 +180,7 @@ The library promises multi-frame super resolution with OpenCV but ships only the
 | SR-CFG-02 | P2 Configure: outputPath honored/overwrite | Tasks | Implementing |
 | SR-CFG-03 | P2 Configure: format by extension | Tasks | Implementing |
 | SR-DOC-01 | P2 Docs: exported types, no multiply | Tasks | Implementing |
-| SR-DOC-02 | P2 Docs: README | Tasks | In Tasks |
+| SR-DOC-02 | P2 Docs: README | Tasks | Implementing |
 
 **Coverage:** 21 total, 21 mapped to tasks (T1–T13), 0 unmapped
 

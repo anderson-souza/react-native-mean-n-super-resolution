@@ -315,7 +315,7 @@ T12 → T13
 
 **Tests**: manual UAT · **Gate**: build + UAT
 **Commit**: `feat(example): demo superResolve with bundled frames`
-**Status**: ✅ Done (Android) — emulator Pixel_9a (x86_64, debug): output 1280×960 (file pulled: JPEG 1280x960), framesUsed 5, elapsed 1129 ms, 9 heartbeat ticks during processing; default path `file:///data/user/0/meannsuperresolution.example/cache/superres-….jpg` (app cache dir). FS dep `react-native-file-access@4.0.4` (README: RN 0.77+ new arch → 4.x; TurboModule codegen). iOS runtime not verified (no Mac)
+**Status**: ✅ Done (0b95f34, Android) — emulator Pixel_9a (x86_64, debug): output 1280×960 (file pulled: JPEG 1280x960), framesUsed 5, elapsed 1129 ms, 9 heartbeat ticks during processing; default path `file:///data/user/0/meannsuperresolution.example/cache/superres-….jpg` (app cache dir). FS dep `react-native-file-access@4.0.4` (README: RN 0.77+ new arch → 4.x; TurboModule codegen). iOS runtime not verified (no Mac)
 
 ---
 
@@ -331,6 +331,7 @@ T12 → T13
 
 **Tests**: none (docs) · **Gate**: build
 **Commit**: `docs: document superResolve API`
+**Status**: ✅ Done — README covers install (New Arch only, NDK r30, build-time OpenCV download, `OPENCV_MOBILE_DIR`), usage, options table, result shape, error codes, temp-dir lifecycle, 5/15/30 rule; usage sample typechecked via scratch copy in `example/src` (tsc exit 0, file removed); final build gate passed (jest 43, native 44)
 
 ---
 
