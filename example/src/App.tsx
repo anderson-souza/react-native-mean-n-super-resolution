@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { BackHandler, Button, StyleSheet, Text, View } from 'react-native';
+import { BackHandler } from 'react-native';
 import type { CameraRun } from './burst/types';
 import CameraScreen from './screens/CameraScreen';
 import HomeScreen from './screens/HomeScreen';
+import PreviewScreen from './screens/PreviewScreen';
 
 type Screen =
   { name: 'home' } | { name: 'camera' } | { name: 'preview'; run: CameraRun };
@@ -42,22 +43,11 @@ export default function App() {
   }
   if (screen.name === 'preview') {
     return (
-      <View style={styles.placeholder}>
-        <Text>
-          Output: {screen.run.result.width}×{screen.run.result.height}
-        </Text>
-        <Button title="Back" onPress={() => setScreen({ name: 'camera' })} />
-      </View>
+      <PreviewScreen
+        run={screen.run}
+        onBack={() => setScreen({ name: 'camera' })}
+      />
     );
   }
   return <HomeScreen onOpenCamera={() => setScreen({ name: 'camera' })} />;
 }
-
-const styles = StyleSheet.create({
-  placeholder: {
-    alignItems: 'center',
-    flex: 1,
-    gap: 12,
-    justifyContent: 'center',
-  },
-});
