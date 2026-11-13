@@ -264,7 +264,7 @@ T12 → T13
 
 **Tests**: build · **Gate**: full
 **Commit**: `build(android): link opencv-mobile and add temp dir provider`
-**Status**: ✅ Done — `yarn turbo run build:android` BUILD SUCCESSFUL; clean 4-ABI `assembleDebug` from empty `.opencv/`: arm64-v8a configure logs `downloading … extracted`, armeabi-v7a/x86/x86_64 log `cache hit (download skipped)`. DEVIATIONS: opencv-mobile v38 Android libs need NDK r30 (`__hash_memory`/`__kmpc_dispatch_deinit` undefined under r27/r29) → example `ndkVersion` 30.0.14904198, README requirement; RN 0.88 gradle-plugin writes backslash paths into `Android-autolinking.cmake` on Windows → example-only path normalization in `example/android/app/build.gradle`
+**Status**: ✅ Done (266f18a) — `yarn turbo run build:android` BUILD SUCCESSFUL; clean 4-ABI `assembleDebug` from empty `.opencv/`: arm64-v8a configure logs `downloading … extracted`, armeabi-v7a/x86/x86_64 log `cache hit (download skipped)`. DEVIATIONS: opencv-mobile v38 Android libs need NDK r30 (`__hash_memory`/`__kmpc_dispatch_deinit` undefined under r27/r29) → example `ndkVersion` 30.0.14904198, README requirement; RN 0.88 gradle-plugin writes backslash paths into `Android-autolinking.cmake` on Windows → example-only path normalization in `example/android/app/build.gradle`
 
 ---
 
@@ -280,6 +280,7 @@ T12 → T13
 
 **Tests**: build · **Gate**: full (CI)
 **Commit**: `build(ios): vendor opencv-mobile xcframework via podspec`
+**Status**: ⚠️ Partial — CI pending (no remote). Local: `npm pack --dry-run` lists `opencv.json`, `cmake/OpenCVMobile.cmake`, `ios/TempDir.mm`, no `.opencv/`; podspec Ruby syntax NOT checked (no `ruby` on host); iOS build/runtime unverified (no Mac)
 
 ---
 
