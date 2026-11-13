@@ -335,6 +335,17 @@ T12 → T13
 
 ---
 
+### Fix iteration 1 (Verifier FAIL f4ffb69)
+
+| Fix | Commit | Evidence |
+| --- | ------ | -------- |
+| F1 SR-ERR-06 mean over used frames (mutant M8) | 6c9a211 | `Align.SkippedFrameIsExcludedFromTheMean`: 4 identical + 1 noise → framesUsed 4, output within ±1 of upscaled reference; M8 (`1.0 / request.paths.size()`) → test FAILED (`C:/Users/ander/AppData/Local/Temp/claude/a51fcc8cdf81d43b/17729ba4-5dfe-493e-9e75-674a03cb439a/scratchpad/mutant-M8.log`), reverted → passes |
+| F2 SR-CFG-03 JPEG quality 95 (mutant M9) | 3b134f8 | `Pipeline.JpegOutputIsEncodedAtQuality95`: output bytes == `imencode(".jpg", expected, quality 95)`; M9 (quality 50) → test FAILED (`C:/Users/ander/AppData/Local/Temp/claude/a51fcc8cdf81d43b/17729ba4-5dfe-493e-9e75-674a03cb439a/scratchpad/mutant-M9.log`), reverted → passes; native suite 46/46 |
+| F3 SR-ERR-04/08 adapter + SR-CORE-07 on device | c79b15c | Pixel_9a debug: `rejected: E_DECODE_FAILED: index=2 could not decode image: …/does-not-exist.png`; concurrent → `distinct …superres-1794535978365-1-….jpg …superres-1794535978365-2-….jpg`, both files in app cache (`C:/Users/ander/AppData/Local/Temp/claude/a51fcc8cdf81d43b/17729ba4-5dfe-493e-9e75-674a03cb439a/scratchpad/f3-logcat.txt`, `f3-1-missing-file.png`, `f3-2-concurrent.png`) |
+| F4 README URI-scheme note | ff7ba79 | Error table states schemes are rejected natively (`toFsPath`), other arg checks in JS + native re-check |
+
+---
+
 ## Phase Execution Map
 
 ```
