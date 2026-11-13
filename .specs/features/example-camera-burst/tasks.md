@@ -9,7 +9,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 ---
 
 **Design**: `.specs/features/example-camera-burst/design.md`
-**Status**: Execute done (2026-11-13) — T1 b05bca8, T2 bdf7574, T3 8dac7a3, T4 a56a90a, T5 6af7d8e, T6 02abb96, T7 UAT fixes d3d30e2 + 859da98 + evidence; awaiting Verifier. Approved (2026-11-12) — Android-only (iOS deferred by owner); UAT on AVD virtual-scene camera; tools: context7, skill `react-native-expert`, adb
+**Status**: Done (2026-11-13) — T1 b05bca8, T2 bdf7574, T3 8dac7a3, T4 a56a90a, T5 6af7d8e, T6 02abb96, T7 UAT fixes d3d30e2 + 859da98 + evidence; verifier fixes 4c2ef45, defe18f, cdc85a6; validation PASS (iteration 2). Approved (2026-11-12) — Android-only (iOS deferred by owner); UAT on AVD virtual-scene camera; tools: context7, skill `react-native-expert`, adb
 
 ---
 

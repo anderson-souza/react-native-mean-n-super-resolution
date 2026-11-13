@@ -1,11 +1,26 @@
 # example-camera-burst Validation
 
 **Date**: 2026-11-13
-**Spec**: `.specs/features/example-camera-burst/spec.md`
-**Diff range**: `5fe938c^..HEAD` (5fe938c spec commit through 80d6f83) on `feat/example-camera-burst`
+**Spec**: `.specs/features/example-camera-burst/spec.md` (CAM-07 and CAM-09 wording tightened in cdc85a6)
+**Diff range**: `5fe938c^..HEAD` (5fe938c spec commit through cdc85a6) on `feat/example-camera-burst`
 **Verifier**: independent sub-agent (author ≠ verifier)
+**Iteration**: 2 of max 3 (re-verification after fix iteration 1: 4c2ef45, defe18f, cdc85a6)
 
-**Verdict**: ❌ FAIL. 2 discrimination-sensor mutants survived in `burstRunner.ts`, the unit-tested layer. Every in-scope AC is implemented and has evidence, and every gate is green. The FAIL comes only from the weak tests. Two small fix tasks cover it (see Fix Plans).
+**Verdict**: ✅ PASS. Both surviving mutants from iteration 1 (M5, M6) are now killed. CAM-12's factory-error path now shows "No camera available". CAM-07 and CAM-09 now give exact text, and the code matches it. All gates are green with 60 tests.
+
+---
+
+## Iteration history
+
+| Iteration | Verdict | Gaps |
+| --------- | ------- | ---- |
+| 1 (code at 80d6f83) | ❌ FAIL | M5 survived (elapsedMs scope, CAM-06); M6 survived (progress after frame, CAM-04); CAM-12 factory-error path showed only the raw error; spec-precision gaps CAM-07, CAM-09 |
+| 2 (code at cdc85a6) | ✅ PASS | none blocking (see Residual notes) |
+
+Fix commits checked:
+- `4c2ef45`, test-only. The fake clock now advances in `takeFrame` (+100) and `deleteFiles` (+10) as well as `superResolve` (+250). It adds two tests: an ordered frame/progress log, and no progress for a failed frame. `burstRunner.ts` is unchanged since 80d6f83 (`git diff --quiet 80d6f83 HEAD -- burstRunner.ts`).
+- `defe18f`. `CameraScreen.tsx:158-164`: the factory-error branch shows "No camera available" with the raw error below it.
+- `cdc85a6`, spec plus artifacts. CAM-07 and CAM-09 reworded. Also commits the iteration-1 validation.md and the lessons files.
 
 ---
 
@@ -13,74 +28,72 @@
 
 | Task | Status | Notes |
 | ---- | ------ | ----- |
-| T1 deps + Android build | ✅ Done | `example/package.json`: deps pinned exactly (`5.2.4`, `0.37.2`, `0.15.2`, no `^`/`~`). Build log: evidence.md CAM-15 row (not re-run by Verifier). |
-| T2 manifest | ✅ Done | `AndroidManifest.xml`: `android.permission.CAMERA` and `android:screenOrientation="portrait"` on MainActivity (diff checked). |
-| T3 burstRunner + tests | ⚠️ Done, weak tests | 15 tests. 2 mutants survive (see Sensor). |
-| T4 HomeScreen split | ✅ Done | `diff` of old `App.tsx` against `screens/HomeScreen.tsx` shows only the asset `require` path depth, the component name/prop and the new button. Nothing else changed. |
-| T5 CameraScreen | ✅ Done | — |
+| T1 deps + Android build | ✅ Done | Deps pinned exactly in `example/package.json`. Build: evidence.md CAM-15 row. |
+| T2 manifest | ✅ Done | `android.permission.CAMERA` and `screenOrientation="portrait"` (diff checked). |
+| T3 burstRunner + tests | ✅ Done | 17 tests. Sensor 6/6 killed (iteration 2). |
+| T4 HomeScreen split | ✅ Done | Verbatim move (diff checked in iteration 1). |
+| T5 CameraScreen | ✅ Done | Plus fix defe18f (CAM-12). |
 | T6 PreviewScreen | ✅ Done | — |
 | T7 UAT evidence | ✅ Done | AVD virtual scene. CAM-12 by code review only (disclosed). |
+| Fix iteration 1 | ✅ Done | 4c2ef45, defe18f, cdc85a6 |
 
 ---
 
 ## Spec-Anchored Acceptance Criteria
 
-Layer per the Test Coverage Matrix: burst logic = unit (Jest), screens = UAT-only, native config = build + static. Test file: `example/src/burst/__tests__/burstRunner.test.ts` (abbreviated `T` below). Evidence file: `evidence/evidence.md` (abbreviated `E`). The Verifier also looked at downscaled copies of PNGs 04, 10b, 12 and 13, and they match E.
+`T` = `example/src/burst/__tests__/burstRunner.test.ts` (line numbers at HEAD). `E` = `evidence/evidence.md`. Screens are UAT-only per the Test Coverage Matrix. In iteration 1 the Verifier looked at downscaled copies of PNGs 04, 10b, 12 and 13, and they match E.
 
 | AC | Spec-defined outcome | Evidence (`file:line` + assertion / UAT row + code) | Result |
 | -- | -------------------- | --------------------------------------------------- | ------ |
-| CAM-01 | Existing buttons unchanged + "Capture burst with camera" | `HomeScreen.tsx:149-153` `<Button title="Capture burst with camera" …>`. Diff against old App shows nothing else changed. E row CAM-01 (`01-home.png`; L1 bundled demo 1280×960). | ✅ PASS (UAT) |
-| CAM-02 | Android: camera screen with live back-camera preview | `App.tsx:35-43` camera branch. `CameraScreen.tsx:144-146` `getCameraDevice(factory,'back')`, `<Camera isActive>` at `:169-177`. E row CAM-02 (`05-camera-idle.png`). | ✅ PASS (UAT) |
-| CAM-03 | Options 5/15/30, mutually exclusive, 5 default | `T:58` `expect([...FRAME_COUNTS]).toEqual([5, 15, 30])`, `T:59` `expect(DEFAULT_FRAME_COUNT).toBe(5)`. UI: `CameraScreen.tsx:69` `useState(DEFAULT_FRAME_COUNT)`, `:180-187` single `count` state. E row CAM-03. | ✅ PASS |
-| CAM-04 | Exactly N snapshots, separate files, progress "i/N" after each frame | `T:71-73` takeFrame indices `0..N-1`. `T:74-81` events `{progress, captured:i+1, total:n}` for N∈{5,15,30}. Files: `CameraScreen.tsx:50` `burst-${burstId}-${i}.jpg`. Text: `CameraScreen.tsx:206-207` `${captured}/${total}`. E row CAM-04 (`10-burst15-progress-*`, 4/15 seen). | ⚠️ PASS with weak test. The "after each frame" ordering is not asserted (mutant M6 survived). |
-| CAM-05 | `superResolve(paths)` once, capture order, default options, processing indicator | `T:82` `toHaveBeenCalledTimes(1)`. `T:83` `superResolve.mock.calls[0]?.[0]).toEqual(pathsFor(0, n))`. `T:97` `order.slice(-2)).toEqual(['processing','superResolve'])`. Default options: `CameraScreen.tsx:55` `superResolve(paths)` with no options arg. Indicator: `:208-209` "Processing…". E L2–L4. | ✅ PASS |
-| CAM-06 | Preview with image, W×H, framesUsed, requested N, ms | Outcome data: `T:103-111` `toEqual({ok:true, run:{result, paths, requested:15, elapsedMs:250}})`. UI: `PreviewScreen.tsx:26-32` (Output W×H, `framesUsed: k / N requested`, `Processing: X ms`). E row CAM-06 (`12-preview30.png` checked: 1992×2656, 30/30, 26120 ms). | ⚠️ PASS with weak test. "elapsedMs = superResolve only" (design / T3 Done-when) is not discriminated (mutant M5 survived). |
-| CAM-07 | User can compare reference (`paths[0]`) with enhanced | `PreviewScreen.tsx:17` `showReference ? file://${paths[0]} : result.path`, toggle at `:33-43`. E row CAM-07 (07/08 PNGs). | ✅ PASS (UAT). ⚠️ Spec-precision gap: "let the user compare" names no mechanism. |
-| CAM-08 | Preview back → camera ready; camera back while idle → home | `App.tsx:21-23` and `:48` preview→camera. `:25-28` hardware back to home only if `!cameraBusy.current`. `:38` on-screen Back → home. E row CAM-08 (14/15 PNGs). | ✅ PASS (UAT) |
-| CAM-09 | Request if not asked; denied → message + "Open settings", no capture controls | `CameraScreen.tsx:85-91` requests once. `:149-155` denied branch renders text + `Open settings` only, with no Camera/count/capture. E row CAM-09 (`04-permission-denied.png` checked). | ✅ PASS (UAT). ⚠️ Spec-precision gap: message text not specified (implemented as "Camera permission denied"). |
-| CAM-10 | Rejection message incl. `E_*` shown; no preview; new burst allowed | `T:121-125` `toEqual({ok:false, stage:'process', message:'E_ALIGNMENT_FAILED: only 1 of 5 frames aligned'})`. `T:174-176` idle again, `start` not null. UI: `CameraScreen.tsx:128-137` sets error text = message and does not call `onResult`. E row CAM-10 (`13-rejection-on-camera.png` checked: `E_DECODE_FAILED: index=15 …`). | ✅ PASS |
-| CAM-11 | Snapshot failure stops burst, no `superResolve`, error shown, new burst allowed | `T:143-151` `stage:'capture'`, `toHaveBeenCalledTimes(4)` (k=3), `superResolve).not.toHaveBeenCalled()`, no `processing`, `isRunning()` false. UI: `CameraScreen.tsx:134-135` "Capture failed: …". E row CAM-11 (`17-background-mid-burst.png`, L6). | ✅ PASS |
-| CAM-12 | No camera → "No camera available" instead of preview | `CameraScreen.tsx:162-163` `!device` → `No camera available`. Code review only (E row CAM-12 discloses this). Note: if `createDeviceFactory()` rejects, `:158-159` shows the raw error text, not "No camera available". | ⚠️ PASS by code review only. Minor deviation on the factory-error path. |
-| CAM-13 | While busy: capture, counts, back disabled; no second burst/navigation | `T:158-163` `isRunning()` true, second `start` `toBeNull()`, takeFrame called 5 times. UI: `CameraScreen.tsx:185` counts `disabled={busy}`, `:192` capture `disabled={!ready \|\| busy}`, `:201` Back `disabled={busy}`. `App.tsx:27` hardware back guarded. E row CAM-13 (`10-burst15-progress-b.png` checked: all greyed out; one outcome line for a double tap). | ✅ PASS |
-| CAM-14 | New burst deletes previous burst's files before capturing | `T:186` first burst `toEqual([])`. `T:195-196` `calls[0]` = delete(prev 5 paths), `calls[1]` = take 0. `T:216` partial paths `['/cache/p0.jpg','/cache/p1.jpg']`. `T:227-228` cleanup failure does not block. Across mounts: runner at module scope, `CameraScreen.tsx:41-57`. E row CAM-14 (one `uniq -c` group left). | ✅ PASS |
-| CAM-15 | Android compiles with VisionCamera; manifest has CAMERA | Manifest diff: `<uses-permission android:name="android.permission.CAMERA" />`. Build: E row CAM-15 (not re-run by Verifier; nothing in the diff raises doubt). | ✅ PASS |
-| CAM-16 | iOS plist key | Deferred (owner, iOS out of scope) | ⏭️ Deferred |
-| CAM-17 | lint, typecheck, test pass | Verifier re-ran all three: exit 0 / 0 / 0, 58 tests (see Gate Check). | ✅ PASS |
-| CAM-18 | Android stays portrait | Manifest diff: `android:screenOrientation="portrait"`. E row CAM-18 (`dumpsys` ROTATION_0 with landscape forced). | ✅ PASS |
-| CAM-19 | iOS notice | Deferred (owner, iOS out of scope) | ⏭️ Deferred |
+| CAM-01 | Existing buttons unchanged + "Capture burst with camera" | `HomeScreen.tsx:149-153` button. Old-App diff shows nothing else changed. E row CAM-01 (`01-home.png`, L1 1280×960). | ✅ PASS (UAT) |
+| CAM-02 | Android: camera screen with live back-camera preview | `App.tsx:35-43`. `CameraScreen.tsx:144` `getCameraDevice(factory, 'back')`, `<Camera isActive>` at `:174`. E row CAM-02. | ✅ PASS (UAT) |
+| CAM-03 | 5/15/30, mutually exclusive, 5 default | `T:62` `expect([...FRAME_COUNTS]).toEqual([5, 15, 30])`, `T:63` `expect(DEFAULT_FRAME_COUNT).toBe(5)`. UI uses a single `count` state (`CameraScreen.tsx:69`, buttons `:185-192`). E row CAM-03. | ✅ PASS |
+| CAM-04 | Exactly N snapshots, separate files, "i/N" updated after each frame | `T:75` takeFrame indices `0..N-1`. `T:78` progress `{captured:i+1,total:n}` for N∈{5,15,30}. **New** `T:107` `expect(log).toEqual(['frame0','progress1',…,'frame4','progress5','processing'])` (frame logged after an awaited tick, so the order is strict). **New** `T:134` failed frame k=2 → events exactly `[progress 1/5, progress 2/5]`. Files `CameraScreen.tsx:50`. Text `:212`. E row CAM-04. | ✅ PASS (M6 killed) |
+| CAM-05 | `superResolve(paths)` once, capture order, default options, processing indicator | `T:86` `toHaveBeenCalledTimes(1)`. `T:87` `toEqual(pathsFor(0, n))`. `T:149` `['processing','superResolve']`. `CameraScreen.tsx:55` no options arg. `:214` "Processing…". E L2–L4. | ✅ PASS |
+| CAM-06 | Preview with image, W×H, framesUsed, requested N, ms | `T:152-163` `toEqual({ok:true, run:{result, paths, requested:15, elapsedMs:250}})`. With the clock advancing in capture (+100/frame) and cleanup (+10), 250 holds only if the timer wraps `superResolve` alone. `PreviewScreen.tsx:26-32`. E row CAM-06 (`12-preview30.png`: 1992×2656, 30/30, 26120 ms). | ✅ PASS (M5 killed) |
+| CAM-07 | **(reworded)** "Enhanced" / "Reference (frame 1)" toggle that switches between the enhanced result and `paths[0]`, at the same size | `PreviewScreen.tsx:34` `'Enhanced'` / `'[Enhanced]'`, `:39` `'Reference (frame 1)'` (bracketed when selected). `:17` `showReference ? file://${paths[0]} : result.path`. Same size: one `<Image>` with `aspectRatio: result.width / result.height` and `resizeMode="contain"` (`:47-48`) for both. E row CAM-07 (07/08 PNGs). | ✅ PASS (UAT). The spec-precision gap is closed. |
+| CAM-08 | Preview back → camera ready; camera back while idle → home | `App.tsx:21-23`, `:48`, `:25-28` (guarded by `cameraBusy`), `:38`. E row CAM-08. | ✅ PASS (UAT) |
+| CAM-09 | **(reworded)** Request if not asked; denied → text "Camera permission denied" + "Open settings", no capture controls | `CameraScreen.tsx:85-91` one request. `:152` `<Text>Camera permission denied</Text>`, `:153` `title="Open settings"`. The branch renders no Camera/count/capture. E row CAM-09 (`04-permission-denied.png` shows exactly that text). | ✅ PASS (UAT). The spec-precision gap is closed. |
+| CAM-10 | Rejection message incl. `E_*` shown; no preview; new burst allowed | `T:173-177` `toEqual({ok:false, stage:'process', message:'E_ALIGNMENT_FAILED: …'})`. `T:228` new start not null. UI sets error = message and does not call `onResult`. E row CAM-10 (`13-rejection-on-camera.png`). | ✅ PASS |
+| CAM-11 | Snapshot failure stops burst, no `superResolve`, error shown, new burst allowed | `T:195-203` `stage:'capture'`, `toHaveBeenCalledTimes(4)`, `superResolve).not.toHaveBeenCalled()`, idle. `T:134` no event for the failed frame. UI "Capture failed: …" (`CameraScreen.tsx:135`). E row CAM-11. | ✅ PASS |
+| CAM-12 | No camera → "No camera available" instead of the preview | `CameraScreen.tsx:168` `!device` → "No camera available". **New** `:158-164`: factory error → `<Text>No camera available</Text>` + raw error below. Code review only (no device without a camera; disclosed in E). | ✅ PASS (code review only; the iteration-1 deviation is fixed) |
+| CAM-13 | While busy: capture, counts, back disabled; one burst | `T:211` `isRunning()).toBe(true)`, `T:213` second start `toBeNull()`, `T:215` 5 frames. UI `CameraScreen.tsx:190`, `:197`, `:206` `disabled`. `App.tsx:27`. E row CAM-13. | ✅ PASS |
+| CAM-14 | New burst deletes previous burst's files first | `T:238` first burst `toEqual([])`. `T:247-248` delete(prev) then take 0. `T:268` partial paths. `T:279` cleanup failure does not block. Module-scope runner (`CameraScreen.tsx:41-57`). E row CAM-14. | ✅ PASS |
+| CAM-15 | Android compiles with VisionCamera; manifest CAMERA | Manifest diff. Build: E row CAM-15 (not re-run; iteration 2 changed only a test, one Text branch and docs). | ✅ PASS |
+| CAM-16 | iOS plist key | Deferred (owner) | ⏭️ Deferred |
+| CAM-17 | lint, typecheck, test pass | Verifier re-run: exit 0/0/0, 60 tests. | ✅ PASS |
+| CAM-18 | Android stays portrait | Manifest `screenOrientation="portrait"`. E row CAM-18. | ✅ PASS |
+| CAM-19 | iOS notice | Deferred (owner) | ⏭️ Deferred |
 
 **Edge cases**
-- [x] Next burst uses the newly selected N: `T:238-239` takeFrame called 35 times in total, `superResolve.mock.calls[1]` length 30.
-- [x] Rotation mid-burst: covered by CAM-18 (portrait lock).
-- [x] `framesUsed` < N shown: `PreviewScreen.tsx:29` renders `framesUsed / requested`. Not exercised on a device, because the virtual scene always gave framesUsed = N (E Observations).
-- [x] Backgrounded mid-burst → capture failure handled: E row CAM-11.
+- [x] Next burst uses the newly selected N: `T:290` takeFrame called 35 times, `T:291` second call `toHaveLength(30)`.
+- [x] Rotation mid-burst: CAM-18.
+- [x] `framesUsed` < N shown: `PreviewScreen.tsx:29`. Not exercised on a device (the virtual scene always gives N).
+- [x] Backgrounded mid-burst: E row CAM-11.
 
-**Status**: all 17 in-scope ACs have evidence. 2 ACs (CAM-04, CAM-06) have unit assertions that do not discriminate a required behavior. 2 minor spec-precision gaps (CAM-07, CAM-09 message text). CAM-12 is verified by code review only.
+**Status**: ✅ All 17 in-scope ACs covered and matched to the spec outcome. No open spec-precision gaps.
 
 ---
 
-## Discrimination Sensor
+## Discrimination Sensor (iteration 2)
 
-Target: `example/src/burst/burstRunner.ts`. Each mutation was applied alone to the working file, `yarn test example/src/burst` was run, and the file was restored with `git checkout -- example/src/burst/burstRunner.ts`. Afterwards `cmp` against a scratch copy of the original matched.
+Same procedure as iteration 1: each mutation was applied alone to `example/src/burst/burstRunner.ts`, `yarn test example/src/burst` was run, and the file was restored with `git checkout --`. A final `cmp` against a scratch copy matched, and `git status --short` was clean.
 
-| # | File:line | Mutation | Result |
-| - | --------- | -------- | ------ |
-| M1 | `burstRunner.ts:60` | Removed the sync guard `if (running) return null;` | ✅ Killed (1 failed) |
-| M2 | `burstRunner.ts:19` | `deleteFiles(previousPaths)` → `deleteFiles([])` | ✅ Killed (2 failed) |
-| M3 | `burstRunner.ts:30` | Partial paths dropped on capture failure (`paths.length = 0` before return) | ✅ Killed (1 failed) |
-| M4 | `burstRunner.ts:38` | `superResolve([...paths].reverse())` | ✅ Killed (3 failed) |
-| M5 | `burstRunner.ts:36` | `const start = deps.now()` moved to the start of `run`, so elapsedMs includes cleanup + capture | ❌ **Survived** (15/15 pass) |
-| M6 | `burstRunner.ts:32` | Progress event moved before `await deps.takeFrame(i)` (emitted before the frame resolves) | ❌ **Survived** (15/15 pass) |
-| M7 | `burstRunner.ts:53` | Removed `running = false` in `finally` | ✅ Killed (6 failed) |
-| M8 | `burstRunner.ts:32` | `captured: i + 1` → `captured: i` | ✅ Killed (3 failed) |
-| M9 | `burstRunner.ts:22` | Cleanup error rethrown instead of logged | ✅ Killed (1 failed) |
+| # | File:line | Mutation | Result | Killing test(s) |
+| - | --------- | -------- | ------ | --------------- |
+| M5 | `burstRunner.ts:36` | `const start = deps.now()` moved to the top of `run` (times cleanup + capture) | ✅ Killed (1 failed) | CAM-06 outcome test `T:152` |
+| M6 | `burstRunner.ts:32` | Progress event moved before `await deps.takeFrame(i)` | ✅ Killed (2 failed) | `T:92` order test, `T:122` failed-frame test |
+| M1 | `burstRunner.ts:60` | Sync running guard removed | ✅ Killed (1 failed) | CAM-13 |
+| M2 | `burstRunner.ts:19` | `deleteFiles(previousPaths)` → `deleteFiles([])` | ✅ Killed (2 failed) | CAM-14 |
+| M3 | `burstRunner.ts:30` | Partial paths dropped on capture failure | ✅ Killed (1 failed) | CAM-14 partial |
+| M4 | `burstRunner.ts:38` | Paths reversed before `superResolve` | ✅ Killed (3 failed) | CAM-04/05 |
 
-**Why the survivors survive**
-- M5: in `setup()` the fake clock moves only inside `superResolve` (`T:28`, `clock += 250`). `takeFrame` and `deleteFiles` never move it, so `elapsedMs` is 250 wherever `start` is sampled.
-- M6: tests check the event sequence (`T:74-81`) and the takeFrame calls (`T:71`) separately and never check how the two interleave. In the CAM-11 test (`T:150`) only the absence of `processing` is checked, so an extra `progress` for the failed frame also goes unnoticed.
+Also tried and left out of the count: moving `start = deps.now()` one line up, before the synchronous `onEvent({type:'processing'})`. It survives, but it is an **equivalent mutant**: `onEvent` is synchronous and never touches the clock, so the change has no observable effect. It is not a test gap.
 
-**Sensor depth**: lightweight+ (9 mutations; the example app is not a P0 path)
-**Result**: 7/9 killed. ❌ FAIL
+Iteration-1 kills M7 (running reset), M8 (off-by-one `captured`) and M9 (cleanup rethrow) were not re-run. Their tests are unchanged, apart from the clock offsets, which do not affect those assertions.
+
+**Sensor depth**: lightweight+ (example app, not a P0 path)
+**Result**: 6/6 killed (cumulative 9/9 distinct non-equivalent mutants killed across both iterations). ✅ PASS
 
 ---
 
@@ -89,48 +102,33 @@ Target: `example/src/burst/burstRunner.ts`. Each mutation was applied alone to t
 | Principle | Status |
 | --------- | ------ |
 | Minimum code | ✅ |
-| Surgical changes | ✅ HomeScreen move is verbatim (diff checked); only the manifest's two lines changed |
-| No scope creep | ✅ No library/C++/wrapper changes in the diff |
-| Matches patterns | ✅ Test style follows `src/__tests__/superResolve.test.ts` (Jest, fake deps, exact message asserts) |
-| Spec-anchored outcome check | ⚠️ CAM-04 ("after each frame") and CAM-06 elapsedMs scope not discriminated |
-| Per-layer Coverage Expectation | ⚠️ Burst logic "all branches": branches are covered, but two ordering/timing semantics are not pinned down |
-| Every test maps to a spec requirement | ✅ All 15 tests carry a CAM id or the edge case in their name |
+| Surgical changes | ✅ Fix commits touch only the test file, one JSX branch and the spec |
+| No scope creep | ✅ |
+| Matches patterns | ✅ |
+| Spec-anchored outcome check | ✅ |
+| Per-layer Coverage Expectation | ✅ Burst logic: every branch, plus ordering and timing semantics pinned down |
+| Every test maps to a spec requirement | ✅ All 17 burst tests name a CAM id or the edge case |
 | Documented guidelines followed | ✅ `CLAUDE.md`, `CONTRIBUTING.md` |
-
-Observations (not failures):
-- `App.tsx:13-17`: `cameraBusy` is a ref updated in a `useEffect` after the busy render, so a hardware back press in the same frame as the Capture tap could slip through. The window is very small, and the UAT double-tap test held.
-- Frame count resets to 5 after returning from the preview (remount). The spec only requires "ready for a new burst".
 
 ---
 
 ## Gate Check
 
-- **Gate command**: `yarn lint && yarn typecheck && yarn test` (UI gate). The Build-gate Android build (`yarn turbo run build:android --force`) was not re-run by the Verifier, as instructed. It relies on E row CAM-15 (green at T1/T2/T6), and nothing in the diff raises doubt.
-- **Result**: lint exit 0, typecheck exit 0, test exit 0. 4 suites, **58 passed**, 0 failed, 0 skipped.
+- **Gate command**: `yarn lint && yarn typecheck && yarn test` (UI gate). The Android build was not re-run (instructed; nothing in the iteration-2 commits affects native config or deps).
+- **Result**: lint exit 0, typecheck exit 0, test exit 0. 4 suites, **60 passed**, 0 failed, 0 skipped.
 - **Test count before feature**: 43
-- **Test count after feature**: 58
-- **Delta**: +15 (all in `example/src/burst/__tests__/burstRunner.test.ts`; count matches the file's 1 + 3 + 4 + 2 + 4 + 1 cases)
+- **Test count after feature**: 60 (iteration 1: 58, +2 from 4c2ef45)
+- **Delta**: +17, all in `burstRunner.test.ts`
 - **Skipped tests**: none
 - **Failures**: none
 
 ---
 
-## Fix Plans
+## Residual notes (non-blocking)
 
-### Fix 1: elapsedMs scope not discriminated (M5)
-- **Root cause**: the fake clock in `setup()` advances only inside `superResolve`.
-- **Fix task**: in `burstRunner.test.ts`, advance the fake clock inside `takeFrame` (and/or `deleteFiles`), for example `clock += 10` per frame, and keep asserting `elapsedMs: 250` in the CAM-06 test.
-- **Verify**: re-apply M5. The CAM-06 test must fail.
-- **Priority**: Major (the asserted outcome is design-specified)
-
-### Fix 2: progress-after-frame ordering not discriminated (M6)
-- **Root cause**: events and takeFrame calls are recorded separately, so their interleaving is never checked.
-- **Fix task**: record `take i` (on resolve) and `progress` into a single ordered log and assert a strict alternation `take0, progress1, take1, progress2, …, processing`. Also assert in the CAM-11 test that the events are exactly `progress` 1..k with no event for the failed frame.
-- **Verify**: re-apply M6. At least one test must fail.
-- **Priority**: Major (CAM-04 says "updated after each frame")
-
-### Fix 3 (optional, Minor): CAM-12 factory-error path
-- `CameraScreen.tsx:158-159` shows the raw error when `createDeviceFactory()` rejects. Either show "No camera available" there too, or record in the spec that a factory error is shown verbatim.
+1. CAM-12 is still verified by code review only, because no device without a camera was available. The evidence file discloses this.
+2. `App.tsx:13-17`: the `cameraBusy` ref is updated in an effect after the busy render, so there is a tiny window in which hardware back could slip through. The UAT double-tap held.
+3. The UAT used the AVD virtual scene, so framesUsed was always N. A real handheld burst was not exercised.
 
 ---
 
@@ -138,24 +136,22 @@ Observations (not failures):
 
 | Requirement | Previous Status | New Status |
 | ----------- | --------------- | ---------- |
-| CAM-01, 02, 03, 05, 07, 08, 09, 10, 11, 13, 14, 15, 17, 18 | Implemented (UAT PASS) | ✅ Verified |
-| CAM-04 | Implemented (UAT PASS) | ❌ Needs Fix (test strength, Fix 2) |
-| CAM-06 | Implemented (UAT PASS) | ❌ Needs Fix (test strength, Fix 1) |
-| CAM-12 | Implemented (code review only) | ⚠️ Verified by code review only |
+| CAM-01..11, 13, 14, 15, 17, 18 | Implemented (UAT PASS) / Needs Fix (CAM-04, CAM-06 in iteration 1) | ✅ Verified |
+| CAM-12 | Implemented (code review only) | ✅ Verified (code review only) |
 | CAM-16, CAM-19 | Deferred | Deferred |
 
 ---
 
 ## Summary
 
-**Overall**: ❌ Not Ready. The behavior is correct; the problem is the strength of two tests.
+**Overall**: ✅ Ready
 
-**Spec-anchored check**: 17/17 in-scope ACs have evidence. 2 assertions are not discriminating (CAM-04, CAM-06). 2 minor spec-precision gaps (CAM-07, CAM-09 message text).
-**Sensor**: 7/9 mutations killed (M5, M6 survived).
-**Gate**: lint 0, typecheck 0, Jest 58/58.
+**Spec-anchored check**: 17/17 in-scope ACs matched the spec outcome. 0 open spec-precision gaps (CAM-07 and CAM-09 tightened in cdc85a6).
+**Sensor**: 6/6 killed in iteration 2, including both iteration-1 survivors (M5, M6).
+**Gate**: lint 0, typecheck 0, Jest 60/60.
 
-**What works**: the full Android flow (home → camera → 5/15/30 burst → preview → back). Permission denial, rejection and capture-failure handling. The single-run guard. Cleanup across mounts. Portrait lock. The bundled demo is unchanged.
+**What works**: the full Android flow, with ordering and timing now protected by tests. Error, permission and no-camera paths match the spec text.
 
-**Issues found**: M5 and M6 surviving mutants (Fixes 1–2). CAM-12 factory-error text (Fix 3, optional).
+**Lessons**: L-007, L-008 and L-009 (recorded in iteration 1) stay as candidates. `lessons.md` has no resolve operation, and promotion to confirmed is automatic only when the same lesson recurs in another feature. This PASS adds no new signal, so nothing new is recorded.
 
-**Next steps**: route Fixes 1–2 to an implementer (test-only changes in `burstRunner.test.ts`), then re-verify by re-running M5/M6.
+**Next steps**: none required for this feature.
