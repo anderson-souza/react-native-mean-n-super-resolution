@@ -48,7 +48,7 @@
 - **Phase / Task**: Done — validation PASS (iteration 2)
 - **Completed**: T1–T7, UAT fixes d3d30e2/859da98, verifier fixes 4c2ef45/defe18f/cdc85a6
 - **In-progress** (file:line): none
-- **Next step**: Owner pushes `feat/example-camera-burst` and opens PR (base: feat/opencv-super-resolution or main after it merges)
+- **Next step**: Review/merge PR #1 (base `feat/opencv-super-resolution`; retarget to `main` after that branch merges); watch CI
 - **Blockers**: none (notes: CAM-12 code-review only; AVD virtual scene, no real handheld burst; iOS deferred)
 - **Uncommitted files**: none
 - **Branch**: feat/example-camera-burst
