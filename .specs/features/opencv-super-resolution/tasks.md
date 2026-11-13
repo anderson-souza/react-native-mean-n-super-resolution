@@ -264,7 +264,7 @@ T12 → T13
 
 **Tests**: build · **Gate**: full
 **Commit**: `build(android): link opencv-mobile and add temp dir provider`
-**Status**: ✅ Done (266f18a) — `yarn turbo run build:android` BUILD SUCCESSFUL; clean 4-ABI `assembleDebug` from empty `.opencv/`: arm64-v8a configure logs `downloading … extracted`, armeabi-v7a/x86/x86_64 log `cache hit (download skipped)`. DEVIATIONS: opencv-mobile v38 Android libs need NDK r30 (`__hash_memory`/`__kmpc_dispatch_deinit` undefined under r27/r29) → example `ndkVersion` 30.0.14904198, README requirement; RN 0.88 gradle-plugin writes backslash paths into `Android-autolinking.cmake` on Windows → example-only path normalization in `example/android/app/build.gradle`
+**Status**: ✅ Done (266f18a) — `yarn turbo run build:android` BUILD SUCCESSFUL; clean 4-ABI `assembleDebug` from empty `.opencv/`: arm64-v8a configure logs `downloading … extracted`, armeabi-v7a/x86/x86_64 log `cache hit (download skipped)`. DEVIATIONS: opencv-mobile v38 Android libs need NDK r30 (`__hash_memory`/`__kmpc_dispatch_deinit` undefined under r27/r29) → example `ndkVersion` 30.0.14904198, README requirement; RN 0.88 gradle-plugin writes backslash paths into `Android-autolinking.cmake` on Windows → example-only path normalization in `example/android/app/build.gradle`; follow-up 23a41d3: CMake fails fast below NDK r30 (verified on r29: configure error; r30: BUILD SUCCESSFUL), CI installs `ndk;30.0.14904198`
 
 ---
 
@@ -331,7 +331,7 @@ T12 → T13
 
 **Tests**: none (docs) · **Gate**: build
 **Commit**: `docs: document superResolve API`
-**Status**: ✅ Done — README covers install (New Arch only, NDK r30, build-time OpenCV download, `OPENCV_MOBILE_DIR`), usage, options table, result shape, error codes, temp-dir lifecycle, 5/15/30 rule; usage sample typechecked via scratch copy in `example/src` (tsc exit 0, file removed); final build gate passed (jest 43, native 44)
+**Status**: ✅ Done (82edeaf) — README covers install (New Arch only, NDK r30, build-time OpenCV download, `OPENCV_MOBILE_DIR`), usage, options table, result shape, error codes, temp-dir lifecycle, 5/15/30 rule; usage sample typechecked via scratch copy in `example/src` (tsc exit 0, file removed); final build gate passed (jest 43, native 44)
 
 ---
 

@@ -34,13 +34,21 @@
 - **Date**: 2026-11-11
 - **Status**: active
 
+### AD-005
+- **Decision**: Consumer Android apps must build with NDK >= r30 (example uses 30.0.14904198); library CMake fails fast below r30. *(Amended 2026-11-13: owner chose "require recent NDK" assuming r29; T9 found r29 also fails to link, r30 works.)*
+- **Reason**: opencv-mobile v38 Android static libs are built with NDK r29+ (newer libc++ `__hash_memory`, OpenMP `__kmpc_dispatch_deinit`) and fail to link under RN 0.88 default NDK 27.1. Owner chose this over pinning an older opencv-mobile (2026-11-12).
+- **Trade-off**: Extra install step (`ndkVersion` in app `android/build.gradle`); NDK bumps must track opencv-mobile releases.
+- **Scope**: Android build, README install docs, CI build-android.
+- **Date**: 2026-11-12
+- **Status**: active
+
 ## Handoff
 
 - **Feature**: `.specs/features/opencv-super-resolution`
 - **Phase / Task**: Execute — Batch B (T7–T13 incl. T7b)
 - **Completed**: Specify, Design (approved), Tasks (approved, T0–T13)
-- **In-progress** (file:line): Batch A done (13477a1..80b1a4c, 35 native tests); Batch B dispatched
-- **Next step**: On Batch B summary → owner decides on GitHub remote/push for CI evidence (T10/T11, iOS) → Verifier.
+- **In-progress** (file:line): T0–T13 committed (Batch B: c9993a9..82edeaf; T10/T11 partial — no remote); fix commits pending: NDK fail-fast CMake, CI NDK r30
+- **Next step**: Worker finishes NDK fix commits → owner decides GitHub remote/push for CI evidence (T10/T11, iOS) → Verifier sub-agent.
 - **Blockers**: none
 - **Uncommitted files**: none (.tlc/, .codegraph/ are untracked tooling)
 - **Branch**: feat/opencv-super-resolution
