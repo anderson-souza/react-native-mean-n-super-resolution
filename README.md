@@ -135,7 +135,7 @@ The Promise rejects with an `Error` whose `message` starts with one of these cod
 
 | Code | When |
 | --- | --- |
-| `E_INVALID_ARGUMENT` | `paths` is not an array of 5, 15 or 30 non-empty strings, `scale` is not 1–4, `outputPath` has an extension other than `.jpg`/`.jpeg`/`.png`, or a path uses an unsupported URI scheme. Argument checks run in JS before any native work starts. |
+| `E_INVALID_ARGUMENT` | `paths` is not an array of 5, 15 or 30 non-empty strings, `scale` is not 1–4, `outputPath` has an extension other than `.jpg`/`.jpeg`/`.png`, or a path uses an unsupported URI scheme. Array, count, `scale` and extension checks run in JS before the native call; the native side re-checks them and rejects non-`file://` URI schemes (`content://`, `ph://`, `http(s)://`) before decoding anything. |
 | `E_DECODE_FAILED` | A frame is missing or cannot be decoded. The message includes `index=<i>`. |
 | `E_SIZE_MISMATCH` | A frame's size differs from `paths[0]`. The message includes the first mismatching `index=<i>`. |
 | `E_ALIGNMENT_FAILED` | Fewer than 2 frames, including the reference, could be aligned. |
