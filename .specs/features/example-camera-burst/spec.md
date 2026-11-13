@@ -120,24 +120,24 @@ The example app only exercises `superResolve` with 5 synthetic bundled PNGs, so 
 
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
-| CAM-01 | P1: Burst capture | Design | Pending |
-| CAM-02 | P1: Burst capture | Design | Pending |
-| CAM-03 | P1: Burst capture | Design | Pending |
-| CAM-04 | P1: Burst capture | Design | Pending |
-| CAM-05 | P1: Burst capture | Design | Pending |
-| CAM-06 | P1: Burst capture | Design | Pending |
-| CAM-07 | P1: Burst capture | Design | Pending |
-| CAM-08 | P1: Burst capture | Design | Pending |
-| CAM-09 | P1: Permissions & failures | Design | Pending |
-| CAM-10 | P1: Permissions & failures | Design | Pending |
-| CAM-11 | P1: Permissions & failures | Design | Pending |
-| CAM-12 | P1: Permissions & failures | Design | Pending |
-| CAM-13 | P1: Permissions & failures | Design | Pending |
-| CAM-14 | P1: Permissions & failures | Design | Pending |
-| CAM-15 | P1: Platform setup | Design | Pending |
+| CAM-01 | P1: Burst capture | Execute | Implemented (UAT PASS) |
+| CAM-02 | P1: Burst capture | Execute | Implemented (UAT PASS) |
+| CAM-03 | P1: Burst capture | Execute | Implemented (UAT PASS) |
+| CAM-04 | P1: Burst capture | Execute | Implemented (UAT PASS) |
+| CAM-05 | P1: Burst capture | Execute | Implemented (UAT PASS) |
+| CAM-06 | P1: Burst capture | Execute | Implemented (UAT PASS) |
+| CAM-07 | P1: Burst capture | Execute | Implemented (UAT PASS) |
+| CAM-08 | P1: Burst capture | Execute | Implemented (UAT PASS) |
+| CAM-09 | P1: Permissions & failures | Execute | Implemented (UAT PASS) |
+| CAM-10 | P1: Permissions & failures | Execute | Implemented (UAT PASS) |
+| CAM-11 | P1: Permissions & failures | Execute | Implemented (UAT PASS) |
+| CAM-12 | P1: Permissions & failures | Execute | Implemented (code review only) |
+| CAM-13 | P1: Permissions & failures | Execute | Implemented (UAT PASS) |
+| CAM-14 | P1: Permissions & failures | Execute | Implemented (UAT PASS) |
+| CAM-15 | P1: Platform setup | Execute | Implemented (UAT PASS) |
 | CAM-16 | P1: Platform setup | - | Deferred (iOS out of scope) |
-| CAM-17 | P1: Platform setup | Design | Pending |
-| CAM-18 | P1: Platform setup | Design | Pending |
+| CAM-17 | P1: Platform setup | Execute | Implemented (UAT PASS) |
+| CAM-18 | P1: Platform setup | Execute | Implemented (UAT PASS) |
 | CAM-19 | P1: Platform setup | - | Deferred (iOS out of scope) |
 
 **Coverage:** 19 total, 17 in scope (CAM-16, CAM-19 deferred), all 17 mapped to tasks.

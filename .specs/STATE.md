@@ -45,10 +45,10 @@
 ## Handoff
 
 - **Feature**: `.specs/features/example-camera-burst`
-- **Phase / Task**: Execute — T1 in progress (tasks approved; Android-only, AVD UAT)
-- **Completed**: spec confirmed (5fe938c); design approved (c475bc1); research: VisionCamera 5.2.4 `takeSnapshot` Android-only, owner chose Android-only camera flow (spec CAM-19 added)
+- **Phase / Task**: Execute done (T1–T7); Verifier next
+- **Completed**: T1–T7 + UAT fixes d3d30e2, 859da98; evidence in `evidence/evidence.md`
 - **In-progress** (file:line): none
-- **Next step**: T1 deps + Android build
-- **Blockers**: none
+- **Next step**: Verifier sub-agent → validation.md
+- **Blockers**: none (gap: CAM-12 code-review only; AVD virtual scene, not real sensor)
 - **Uncommitted files**: none
 - **Branch**: feat/example-camera-burst
