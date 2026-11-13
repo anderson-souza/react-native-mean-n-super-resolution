@@ -297,7 +297,7 @@ T12 → T13
 
 **Tests**: none (CI config) · **Gate**: build
 **Commit**: `ci: run native tests and cache opencv-mobile`
-**Status**: ⚠️ Partial — CI pending (no remote); `ci.yml` parses (jobs: lint, test, test-native, build-library, build-android, build-ios); local Phase 3 build gate passed (jest 43, native 44, prepare OK)
+**Status**: ⚠️ Partial (d48092f) — CI pending (no remote); `ci.yml` parses (jobs: lint, test, test-native, build-library, build-android, build-ios); local Phase 3 build gate passed (jest 43, native 44, prepare OK)
 
 ---
 
@@ -315,6 +315,7 @@ T12 → T13
 
 **Tests**: manual UAT · **Gate**: build + UAT
 **Commit**: `feat(example): demo superResolve with bundled frames`
+**Status**: ✅ Done (Android) — emulator Pixel_9a (x86_64, debug): output 1280×960 (file pulled: JPEG 1280x960), framesUsed 5, elapsed 1129 ms, 9 heartbeat ticks during processing; default path `file:///data/user/0/meannsuperresolution.example/cache/superres-….jpg` (app cache dir). FS dep `react-native-file-access@4.0.4` (README: RN 0.77+ new arch → 4.x; TurboModule codegen). iOS runtime not verified (no Mac)
 
 ---
 
