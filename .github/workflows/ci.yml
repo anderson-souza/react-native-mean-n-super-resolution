@@ -116,6 +116,8 @@ jobs:
         if: env.turbo_cache_hit != 1
         run: |
           /bin/bash -c "yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses > /dev/null"
+          # why: opencv-mobile v38 needs NDK r30+; pin the version example/android/build.gradle uses.
+          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "ndk;30.0.14904198" > /dev/null
 
 
       - name: Cache Gradle
