@@ -34,6 +34,10 @@ Example app only (`example/`). Keeps the existing bundled-asset demo and adds a 
 - `scale` fixed at default 2 (no selector).
 - Runtime UAT on an Android device only; iOS gets config (Info.plist camera usage string, Podfile) but no runtime evidence (no Mac available).
 
+### Platform scope (Design, 2026-11-12)
+
+- Camera burst is **Android-only**: VisionCamera 5.2.4 iOS `takeSnapshot()` throws. iOS shows a notice instead of the camera.
+
 ### Agent's Discretion
 
 - VisionCamera major version (v4 vs v5/Nitro) and how a snapshot becomes a local file — decided in Design after checking RN 0.88 / New Architecture compatibility.

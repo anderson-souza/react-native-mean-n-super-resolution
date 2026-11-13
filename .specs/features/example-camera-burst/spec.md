@@ -20,6 +20,7 @@ The example app only exercises `superResolve` with 5 synthetic bundled PNGs, so 
 | Full-resolution `takePhoto` burst | Owner chose preview snapshots for speed (deferred). |
 | React Navigation / navigation library | Owner chose a state switch in `App.tsx`. |
 | iOS runtime verification | No Mac available; iOS gets config only. |
+| Camera burst on iOS | VisionCamera 5.2.4 `takeSnapshot()` throws `"takeSnapshot() is not available on iOS!"`; owner chose Android-only camera flow (2026-11-12). iOS shows a notice (CAM-19). |
 | Video, flash, focus/exposure controls, front/back toggle | Not needed to demo the library. |
 
 ---
@@ -32,7 +33,8 @@ The example app only exercises `superResolve` with 5 synthetic bundled PNGs, so 
 | Navigation | `App.tsx` state switch `home → camera → preview` | Owner choice | y |
 | Scale | Default `scale: 2` (option omitted) | Owner choice | y |
 | UAT platform | Android device only; iOS config-only | Owner choice; no Mac | y |
-| VisionCamera version | Chosen in Design (must support RN 0.88 New Architecture and snapshot-to-file on Android) | Implementation detail | n (Design) |
+| VisionCamera version | `react-native-vision-camera@5.2.4` + `react-native-nitro-modules` + `react-native-nitro-image` (see design.md) | Latest release; snapshot API checked in its published source | y |
+| iOS camera flow | Android-only; iOS shows a notice instead of the camera | `takeSnapshot()` is Android-only in v5 | y |
 | Camera device | Back camera | Standard for scene capture | y |
 | Default frame count on camera screen | 5 selected | Fastest; matches existing demo | n |
 | Permission denied | Camera screen shows a message and a button that opens system settings; no crash, no capture | Standard RN permission UX | n |
@@ -56,7 +58,7 @@ The example app only exercises `superResolve` with 5 synthetic bundled PNGs, so 
 **Acceptance Criteria**:
 
 1. WHEN the home screen renders THEN it SHALL show the existing bundled-asset button and check buttons unchanged, plus a new button labelled "Capture burst with camera". (CAM-01)
-2. WHEN the user taps "Capture burst with camera" THEN the app SHALL show the camera screen with a live back-camera preview. (CAM-02)
+2. WHEN the user taps "Capture burst with camera" on Android THEN the app SHALL show the camera screen with a live back-camera preview. (CAM-02)
 3. WHEN the camera screen renders THEN it SHALL show three mutually exclusive frame-count options 5, 15 and 30, with 5 selected by default. (CAM-03)
 4. WHEN the user taps capture with N selected THEN the app SHALL take exactly N snapshots back-to-back, each written as a separate local file, and SHALL show progress as "`i`/N" updated after each frame. (CAM-04)
 5. WHEN all N frames are captured THEN the app SHALL call `superResolve(paths)` with those N paths in capture order (first captured = `paths[0]`) and default options, and SHALL show a processing indicator until it settles. (CAM-05)
@@ -99,6 +101,7 @@ The example app only exercises `superResolve` with 5 synthetic bundled PNGs, so 
 2. WHEN the iOS project is inspected THEN `Info.plist` SHALL contain a non-empty `NSCameraUsageDescription`. (CAM-16)
 3. WHEN `yarn lint`, `yarn typecheck` and `yarn test` run at the repo root THEN they SHALL pass with the new example code included. (CAM-17)
 4. WHEN the example app runs on Android or iOS THEN it SHALL stay in portrait orientation when the device rotates. (CAM-18)
+5. WHEN the user taps "Capture burst with camera" on iOS THEN the app SHALL show a screen with the text "Burst capture is Android-only in this example" and a back button, and SHALL NOT mount the camera. (CAM-19)
 
 **Independent Test**: CI-style Android build succeeds; grep shows the permission and plist key; lint/typecheck/test green.
 
@@ -135,8 +138,9 @@ The example app only exercises `superResolve` with 5 synthetic bundled PNGs, so 
 | CAM-16 | P1: Platform setup | Design | Pending |
 | CAM-17 | P1: Platform setup | Design | Pending |
 | CAM-18 | P1: Platform setup | Design | Pending |
+| CAM-19 | P1: Platform setup | Design | Pending |
 
-**Coverage:** 18 total, 0 mapped to tasks, 18 unmapped (pre-Tasks).
+**Coverage:** 19 total, 0 mapped to tasks, 19 unmapped (pre-Tasks).
 
 ---
 

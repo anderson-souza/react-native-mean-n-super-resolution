@@ -44,11 +44,11 @@
 
 ## Handoff
 
-- **Feature**: `.specs/features/opencv-super-resolution`
-- **Phase / Task**: Done — validation PASS (iteration 2, conditional on owner-accepted gaps)
-- **Completed**: T0–T13 + T7b + fix iteration 1 (F1–F4); validation.md ff73d23
+- **Feature**: `.specs/features/example-camera-burst`
+- **Phase / Task**: Design drafted, awaiting owner approval
+- **Completed**: spec confirmed (5fe938c); research: VisionCamera 5.2.4 `takeSnapshot` Android-only, owner chose Android-only camera flow (spec CAM-19 added)
 - **In-progress** (file:line): none
-- **Next step**: Owner adds GitHub remote + pushes branch → confirm CI (test-native, build-android NDK r30, build-ios) → iOS device UAT on a Mac → open PR.
-- **Blockers**: none (open evidence gaps: CI never run, iOS build/runtime, EXIF test)
-- **Uncommitted files**: none
-- **Branch**: feat/opencv-super-resolution
+- **Next step**: Owner approves design.md, then Tasks (expect ~7 tasks: deps+native config/build, burstRunner+tests, screen split, CameraScreen, PreviewScreen, UAT)
+- **Blockers**: none
+- **Uncommitted files**: `.specs/features/example-camera-burst/{spec,context,design}.md`, `.specs/STATE.md`
+- **Branch**: feat/example-camera-burst
