@@ -45,10 +45,10 @@
 ## Handoff
 
 - **Feature**: `.specs/features/example-camera-burst`
-- **Phase / Task**: Design drafted, awaiting owner approval
-- **Completed**: spec confirmed (5fe938c); research: VisionCamera 5.2.4 `takeSnapshot` Android-only, owner chose Android-only camera flow (spec CAM-19 added)
+- **Phase / Task**: Tasks drafted (T1–T7), awaiting owner approval
+- **Completed**: spec confirmed (5fe938c); design approved (c475bc1); research: VisionCamera 5.2.4 `takeSnapshot` Android-only, owner chose Android-only camera flow (spec CAM-19 added)
 - **In-progress** (file:line): none
-- **Next step**: Owner approves design.md, then Tasks (expect ~7 tasks: deps+native config/build, burstRunner+tests, screen split, CameraScreen, PreviewScreen, UAT)
+- **Next step**: Owner approves tasks.md + tools, then Execute inline from T1
 - **Blockers**: none
-- **Uncommitted files**: `.specs/features/example-camera-burst/{spec,context,design}.md`, `.specs/STATE.md`
+- **Uncommitted files**: `.specs/features/example-camera-burst/tasks.md`, `.specs/STATE.md`
 - **Branch**: feat/example-camera-burst

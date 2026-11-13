@@ -19,7 +19,7 @@ The example app only exercises `superResolve` with 5 synthetic bundled PNGs, so 
 | Scale selector | Fixed `scale: 2` (owner decision). |
 | Full-resolution `takePhoto` burst | Owner chose preview snapshots for speed (deferred). |
 | React Navigation / navigation library | Owner chose a state switch in `App.tsx`. |
-| iOS runtime verification | No Mac available; iOS gets config only. |
+| Any iOS work (config, notice, verification) | Owner decision 2026-11-12: focus on Android only; CAM-16 and CAM-19 deferred, CAM-18 Android-only. |
 | Camera burst on iOS | VisionCamera 5.2.4 `takeSnapshot()` throws `"takeSnapshot() is not available on iOS!"`; owner chose Android-only camera flow (2026-11-12). iOS shows a notice (CAM-19). |
 | Video, flash, focus/exposure controls, front/back toggle | Not needed to demo the library. |
 
@@ -100,7 +100,7 @@ The example app only exercises `superResolve` with 5 synthetic bundled PNGs, so 
 1. WHEN the Android example is built (`yarn turbo run build:android` / `yarn example android`) THEN it SHALL compile with `react-native-vision-camera` and the manifest SHALL declare `android.permission.CAMERA`. (CAM-15)
 2. WHEN the iOS project is inspected THEN `Info.plist` SHALL contain a non-empty `NSCameraUsageDescription`. (CAM-16)
 3. WHEN `yarn lint`, `yarn typecheck` and `yarn test` run at the repo root THEN they SHALL pass with the new example code included. (CAM-17)
-4. WHEN the example app runs on Android or iOS THEN it SHALL stay in portrait orientation when the device rotates. (CAM-18)
+4. WHEN the example app runs on Android THEN it SHALL stay in portrait orientation when the device rotates. (CAM-18)
 5. WHEN the user taps "Capture burst with camera" on iOS THEN the app SHALL show a screen with the text "Burst capture is Android-only in this example" and a back button, and SHALL NOT mount the camera. (CAM-19)
 
 **Independent Test**: CI-style Android build succeeds; grep shows the permission and plist key; lint/typecheck/test green.
@@ -135,12 +135,12 @@ The example app only exercises `superResolve` with 5 synthetic bundled PNGs, so 
 | CAM-13 | P1: Permissions & failures | Design | Pending |
 | CAM-14 | P1: Permissions & failures | Design | Pending |
 | CAM-15 | P1: Platform setup | Design | Pending |
-| CAM-16 | P1: Platform setup | Design | Pending |
+| CAM-16 | P1: Platform setup | - | Deferred (iOS out of scope) |
 | CAM-17 | P1: Platform setup | Design | Pending |
 | CAM-18 | P1: Platform setup | Design | Pending |
-| CAM-19 | P1: Platform setup | Design | Pending |
+| CAM-19 | P1: Platform setup | - | Deferred (iOS out of scope) |
 
-**Coverage:** 19 total, 0 mapped to tasks, 19 unmapped (pre-Tasks).
+**Coverage:** 19 total, 17 in scope (CAM-16, CAM-19 deferred), all 17 mapped to tasks.
 
 ---
 
