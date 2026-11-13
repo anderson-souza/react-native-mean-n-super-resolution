@@ -247,7 +247,7 @@ T12 → T13
 
 **Tests**: unit (mapping) + build · **Gate**: quick (native); full after T9
 **Commit**: `feat(native): async superResolve TurboModule method`
-**Status**: ✅ Done — host mapping tests 5/5; codegen structs `NativeMeanNSuperResolutionSuperResolveOptions`/`…SuperResolveResult` (+`…Bridging`) from `example/android/app/build/generated/source/codegen/pureCxx/MeanNSuperResolutionSpec/jni/react/renderer/components/MeanNSuperResolutionSpec/MeanNSuperResolutionSpecJSI.h`; no `cv::Exception` branch (AD-004); Android compile evidence in T9
+**Status**: ✅ Done (c9993a9) — host mapping tests 5/5; codegen structs `NativeMeanNSuperResolutionSuperResolveOptions`/`…SuperResolveResult` (+`…Bridging`) from `example/android/app/build/generated/source/codegen/pureCxx/MeanNSuperResolutionSpec/jni/react/renderer/components/MeanNSuperResolutionSpec/MeanNSuperResolutionSpecJSI.h`; no `cv::Exception` branch (AD-004); Android compile evidence in T9
 
 ---
 
@@ -264,6 +264,7 @@ T12 → T13
 
 **Tests**: build · **Gate**: full
 **Commit**: `build(android): link opencv-mobile and add temp dir provider`
+**Status**: ✅ Done — `yarn turbo run build:android` BUILD SUCCESSFUL; clean 4-ABI `assembleDebug` from empty `.opencv/`: arm64-v8a configure logs `downloading … extracted`, armeabi-v7a/x86/x86_64 log `cache hit (download skipped)`. DEVIATIONS: opencv-mobile v38 Android libs need NDK r30 (`__hash_memory`/`__kmpc_dispatch_deinit` undefined under r27/r29) → example `ndkVersion` 30.0.14904198, README requirement; RN 0.88 gradle-plugin writes backslash paths into `Android-autolinking.cmake` on Windows → example-only path normalization in `example/android/app/build.gradle`
 
 ---
 
