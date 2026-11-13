@@ -59,8 +59,16 @@ export default function CameraScreen({
     };
   }, []);
 
+  // why: after a first "Don't allow" Android still reports 'not-determined'
+  // (re-askable), so the denial is tracked from the request result (CAM-09).
+  const [deniedOnce, setDeniedOnce] = useState(false);
+  const askedRef = useRef(false);
   useEffect(() => {
-    if (!hasPermission && canRequestPermission) requestPermission();
+    if (hasPermission || !canRequestPermission || askedRef.current) return;
+    askedRef.current = true;
+    requestPermission().then((granted) => {
+      if (!granted && mounted.current) setDeniedOnce(true);
+    });
   }, [hasPermission, canRequestPermission, requestPermission]);
 
   useEffect(() => {
@@ -134,7 +142,7 @@ export default function CameraScreen({
   const device = factory ? getCameraDevice(factory, 'back') : undefined;
 
   let body;
-  if (!hasPermission && !canRequestPermission) {
+  if (!hasPermission && (deniedOnce || !canRequestPermission)) {
     body = (
       <View style={styles.center}>
         <Text>Camera permission denied</Text>
