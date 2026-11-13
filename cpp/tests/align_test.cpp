@@ -167,3 +167,25 @@ TEST(Align, FailsWhenFewerThanTwoFramesAlign) {
   }
   EXPECT_EQ(code, "E_ALIGNMENT_FAILED");
 }
+
+// invariant: SR-ERR-06 + Goal "pixelwise mean of the aligned, upscaled frames":
+// a skipped frame must leave the mean over the frames actually used.
+TEST(Align, SkippedFrameIsExcludedFromTheMean) {
+  const cv::Mat ref = shiftedFrame(scene(kW, kH, kMargin), kW, kH, kMargin, {0, 0});
+  std::vector<cv::Mat> frames(5, ref);
+  frames[2] = unrelatedNoise(kW, kH, 99);
+  const auto paths = writeFrames(frames);
+  const std::string out = (std::filesystem::path(paths[0]).parent_path() / "out.png").string();
+
+  const sr::Result res = sr::run(requestFor(paths, out));
+  ASSERT_EQ(res.framesUsed, 4);
+
+  const cv::Mat got = cv::imread(out, cv::IMREAD_COLOR);
+  const cv::Mat expected = upscale(cv::imread(paths[0], cv::IMREAD_COLOR), 2);
+  ASSERT_EQ(got.size(), expected.size());
+  cv::Mat diff;
+  cv::absdiff(got, expected, diff);
+  double maxDiff = 0;
+  cv::minMaxLoc(diff.reshape(1), nullptr, &maxDiff);
+  EXPECT_LE(maxDiff, 1.0);
+}
