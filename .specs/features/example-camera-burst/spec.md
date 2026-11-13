@@ -63,7 +63,7 @@ The example app only exercises `superResolve` with 5 synthetic bundled PNGs, so 
 4. WHEN the user taps capture with N selected THEN the app SHALL take exactly N snapshots back-to-back, each written as a separate local file, and SHALL show progress as "`i`/N" updated after each frame. (CAM-04)
 5. WHEN all N frames are captured THEN the app SHALL call `superResolve(paths)` with those N paths in capture order (first captured = `paths[0]`) and default options, and SHALL show a processing indicator until it settles. (CAM-05)
 6. WHEN `superResolve` resolves THEN the app SHALL show the preview screen with the enhanced image, output width×height, `framesUsed`, the requested N, and processing time in ms. (CAM-06)
-7. WHEN the preview screen renders THEN it SHALL let the user compare the reference frame (`paths[0]`) with the enhanced image. (CAM-07)
+7. WHEN the preview screen renders THEN it SHALL offer an "Enhanced" / "Reference (frame 1)" toggle that switches the displayed image between the enhanced result and the reference frame (`paths[0]`), at the same size. (CAM-07)
 8. WHEN the user taps back on the preview screen THEN the app SHALL return to the camera screen ready for a new burst; WHEN the user taps back on the camera screen while idle THEN the app SHALL return to the home screen. (CAM-08)
 
 **Independent Test**: On an Android device: home → "Capture burst with camera" → pick 15 → capture → progress counts to 15/15 → preview shows image with output = 2 × frame size, `framesUsed` ≤ 15, and the reference frame for comparison.
@@ -78,7 +78,7 @@ The example app only exercises `superResolve` with 5 synthetic bundled PNGs, so 
 
 **Acceptance Criteria**:
 
-1. WHEN the camera screen opens and permission has not been asked THEN the app SHALL request camera permission; WHEN it is denied THEN the screen SHALL show a message and an "Open settings" button and SHALL NOT render capture controls. (CAM-09)
+1. WHEN the camera screen opens and permission has not been asked THEN the app SHALL request camera permission; WHEN it is denied THEN the screen SHALL show the text "Camera permission denied" and an "Open settings" button and SHALL NOT render capture controls. (CAM-09)
 2. WHEN `superResolve` rejects THEN the camera screen SHALL show the rejection message (including its `E_*` code), SHALL NOT open the preview, and SHALL allow a new burst. (CAM-10)
 3. WHEN a snapshot fails mid-burst THEN the app SHALL stop the burst, SHALL NOT call `superResolve`, SHALL show the error, and SHALL allow a new burst. (CAM-11)
 4. WHEN no camera device is available THEN the camera screen SHALL show "No camera available" instead of the preview. (CAM-12)
