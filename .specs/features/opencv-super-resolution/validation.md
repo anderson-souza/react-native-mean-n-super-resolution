@@ -5,7 +5,11 @@
 **Diff range**: `03f379c..962beac` (branch `feat/opencv-super-resolution`, 20 commits)
 **Verifier**: independent sub-agent (author ≠ verifier), evidence-or-zero
 
-## Verdict: FAIL ❌
+## Overall verdict (iteration 2, HEAD `4f61540`): PASS ✅, conditional on owner-accepted gaps
+
+All fixable gaps from iteration 1 are closed: M8 and M9 are now killed, and so are 3 fresh mutants. SR-CORE-06 (iOS) and CI remain **open evidence gaps**. They are not passed, and closing them needs a Mac and a git remote, which the owner has accepted as out of reach for now. See "Iteration 2" at the end of this file.
+
+## Iteration 1 verdict (HEAD `962beac`): FAIL ❌
 
 The build gate is green and the main behavior is well covered, but **2 sensor mutants survived** (the mean divisor when a frame is skipped, and JPEG quality 95). Under the process, a surviving mutant is a fix task. Separately, iOS (SR-CORE-06) has no evidence at all. That gap is owner-accepted and stays open.
 
@@ -181,3 +185,73 @@ Structural note: `cpp/MeanNSuperResolutionImpl.cpp` (worker thread, `toScale`, `
 **Spec-anchored check**: 17/21 ACs matched; 3 spec-precision gaps.
 **Sensor**: 10/12 killed.
 **Gate**: lint/typecheck/prepare exit 0; Jest 43/43; native 44/44.
+
+---
+
+# Iteration 2 (re-verify 1 of max 3)
+
+**Date**: 2026-11-12
+**Diff range**: `f4ffb69..4f61540`. Fix commits: `6c9a211` (F1), `3b134f8` (F2), `c79b15c` (F3), `ff7ba79` (F4), `4f61540` (tasks.md).
+**Verdict**: PASS ✅, conditional on the owner-accepted iOS/CI evidence gaps
+
+## Gate (rerun by verifier)
+
+| Step | Exit | Result |
+| ---- | ---- | ------ |
+| `yarn lint` | 0 | clean |
+| `yarn typecheck` | 0 | clean |
+| `yarn test` | 0 | 43/43 |
+| `yarn test:native` | 0 | **46/46** (+2: `Align.SkippedFrameIsExcludedFromTheMean`, `Pipeline.JpegOutputIsEncodedAtQuality95`) |
+| `yarn prepare` | 0 | OK |
+
+No tests were removed or weakened. The F3 change in `example/src/App.tsx` only adds buttons; the original demo flow is unchanged apart from extracting `copyFrames()`.
+
+## Discrimination Sensor (iteration 2)
+
+Run in a scratch worktree at `4f61540` (baseline 46/46), with the same harness as iteration 1. The worktree was removed afterwards; the real tree was untouched.
+
+| # | File:line | Mutation | Killed? (by) |
+| - | --------- | -------- | ------------ |
+| M8 (re-run) | `cpp/sr/Pipeline.cpp:130` | Divisor `1/framesUsed` → `1/paths.size()` | ✅ `Align.SkippedFrameIsExcludedFromTheMean` |
+| M9 (re-run) | `cpp/sr/Pipeline.cpp:43` | JPEG quality 95 → 50 | ✅ `Pipeline.JpegOutputIsEncodedAtQuality95` |
+| M13 (new) | `cpp/sr/Pipeline.cpp:114` | Skipped frame still accumulated into the sum (framesUsed stays 4) | ✅ `Align.SkippedFrameIsExcludedFromTheMean` |
+| M14 (new) | `cpp/sr/Pipeline.cpp:43` | JPEG quality 95 → 94 (off by one) | ✅ `Pipeline.JpegOutputIsEncodedAtQuality95` |
+| M15 (new) | `cpp/sr/Pipeline.cpp:130` | Mean rounding bias `+1.0` (inside the ±1 tolerance of the pixel tests) | ✅ `Pipeline.JpegOutputIsEncodedAtQuality95` (byte-exact) |
+
+**Result**: 5/5 killed. Cumulative: 15/17, and both survivors from iteration 1 are now killed.
+
+## Re-assessed criteria
+
+| AC | Evidence (iteration 2) | Result |
+| -- | ---------------------- | ------ |
+| SR-ERR-06 | `align_test.cpp:173-191`: 4 identical frames + 1 noise frame → `ASSERT_EQ(res.framesUsed, 4)` and `EXPECT_LE(maxDiff, 1.0)` against the cubic ×2 upscale of the reference. This pins "skipped frame excluded from the mean" to output pixels. | ✅ PASS |
+| SR-CFG-03 | `pipeline_test.cpp:92-109`: output bytes `EXPECT_EQ` size and `std::equal` against `cv::imencode(".jpg", expected, {IMWRITE_JPEG_QUALITY, 95})`. Valid because identical frames make the mean byte-identical to the upscaled reference. | ✅ PASS |
+| SR-ERR-08 | Adapter rejection path now has device evidence. `f3-logcat.txt` 02:12:26.953, PID 9536: `[superResolve:missing-file] rejected: E_DECODE_FAILED: index=2 could not decode image: …/does-not-exist.png`. The same PID logs the later concurrent check at 02:12:59.669, and `grep` finds 0 `FATAL EXCEPTION`/`SIGABRT`/`Fatal signal`, so the app did not crash. The worker `catch(...)` → `promise.reject` path (`MeanNSuperResolutionImpl.cpp:57-58`) is shared by every exception type, and the mapping for non-`SrError` types is unit-tested (`error_mapping_test.cpp`). Note: `f3-1-missing-file.png` was captured while the call was still running (buttons show "RUNNING…"), so it proves nothing on its own; the logcat line is the evidence. | ✅ PASS (Android) |
+| SR-CORE-07 | Device: `f3-2-concurrent.png` and logcat 02:12:59.669 show `distinct` and two different `file:///data/user/0/…/cache/superres-…-1-….jpg` / `…-2-….jpg` paths in the app cache dir, from `Promise.all` of two calls (`App.tsx:125-133`). On device, both promises resolved with JPEG paths in the cache dir, but the app did not check that both files exist. That conjunct is covered on the host (`pipeline_test.cpp:242`). | ✅ PASS (Android + host) |
+| SR-DOC-02 | `README.md:138` now says that array/count/scale/extension checks run in JS and that URI-scheme rejection is native. This matches `Paths.cpp:64-67`. | ✅ PASS |
+
+## Updated AC tally
+
+- **20/21 matched**: all of iteration 1's 17, plus SR-ERR-06, SR-CFG-03 and SR-ERR-08 (SR-ERR-06 was in the 17 but its mutant now dies too). SR-CORE-05 counts as matched on Android UAT only.
+- **Not matched**: SR-CORE-06 (iOS parity), an open evidence gap accepted by the owner.
+- **Spec-precision gaps**: carried over from iteration 1, now addressed in the tests. No spec text changed.
+  1. Skipped-frame mean: now asserted.
+  2. Adapter harness: now an example-app UAT.
+  3. EXIF: still evidenced only at source level, by the spike note.
+
+## Open evidence gaps (unchanged, owner-accepted)
+
+1. No git remote, so CI (`test-native`, `build-android`, `build-ios`, `.opencv` cache) has never run.
+2. No Mac, so iOS build/runtime is unverified (SR-CORE-06, and the iOS side of CORE-01..03, 05, 07, ERR-08).
+3. EXIF orientation has no test; there is source-level evidence only.
+
+## Requirement Traceability Update (iteration 2)
+
+| Requirement | Status |
+| ----------- | ------ |
+| SR-CORE-01..05, 07; SR-ERR-01..09; SR-CFG-01..03; SR-DOC-01..02 | ✅ Verified (Android + host) |
+| SR-CORE-06 | ⏸ Blocked: iOS unverifiable without a Mac (owner-accepted) |
+
+## Lessons
+
+No new signal in this iteration. Lessons L-001..L-006 from iteration 1 stand. None was confirmed, so nothing is penalized.
