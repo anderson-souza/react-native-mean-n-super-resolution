@@ -156,7 +156,12 @@ export default function CameraScreen({
   } else if (!hasPermission) {
     body = <Text style={styles.center}>Requesting camera permission…</Text>;
   } else if (factoryError) {
-    body = <Text style={styles.error}>{factoryError}</Text>;
+    body = (
+      <View style={styles.center}>
+        <Text>No camera available</Text>
+        <Text style={styles.error}>{factoryError}</Text>
+      </View>
+    );
   } else if (!factory) {
     body = <Text style={styles.center}>Loading camera…</Text>;
   } else if (!device) {
