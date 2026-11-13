@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { createRef, useEffect, useMemo, useRef, useState } from 'react';
 import { Button, Linking, StyleSheet, Text, View } from 'react-native';
 import { Dirs, FileSystem } from 'react-native-file-access';
 import { superResolve } from 'react-native-mean-n-super-resolution';
@@ -35,6 +35,27 @@ async function deleteFiles(paths: string[]) {
   }
 }
 
+// why: module scope, not component state: every successful burst unmounts this
+// screen (preview), and the runner must remember the previous burst's files
+// across mounts to delete them (CAM-14).
+const cameraRef = createRef<CameraRef>();
+let burstId = 0;
+const runner = createBurstRunner({
+  takeFrame: async (i) => {
+    const camera = cameraRef.current;
+    if (!camera) throw new Error('Camera is not mounted');
+    // why: a fresh id per burst keeps file names unique, so <Image> never shows a cached old frame.
+    if (i === 0) burstId = Date.now();
+    const image = await camera.takeSnapshot();
+    const path = `${Dirs.CacheDir}/burst-${burstId}-${i}.jpg`;
+    await image.saveToFileAsync(path, 'jpg', 95);
+    return path;
+  },
+  deleteFiles,
+  superResolve: (paths) => superResolve(paths),
+  now: () => Date.now(),
+});
+
 export default function CameraScreen({
   onBack,
   onResult,
@@ -44,13 +65,11 @@ export default function CameraScreen({
     useCameraPermission();
   const [factory, setFactory] = useState<CameraDeviceFactory | null>(null);
   const [factoryError, setFactoryError] = useState<string | null>(null);
-  const cameraRef = useRef<CameraRef>(null);
   const [ready, setReady] = useState(false);
   const [count, setCount] = useState<FrameCount>(DEFAULT_FRAME_COUNT);
   const [status, setStatus] = useState<Status>({ kind: 'idle' });
   const [error, setError] = useState<string | null>(null);
   const mounted = useRef(true);
-  const burstId = useRef(0);
 
   useEffect(() => {
     mounted.current = true;
@@ -81,26 +100,6 @@ export default function CameraScreen({
         setFactoryError(e instanceof Error ? e.message : String(e))
     );
   }, []);
-
-  const runner = useMemo(
-    () =>
-      createBurstRunner({
-        takeFrame: async (i) => {
-          const camera = cameraRef.current;
-          if (!camera) throw new Error('Camera is not mounted');
-          // why: a fresh id per burst keeps file names unique, so <Image> never shows a cached old frame.
-          if (i === 0) burstId.current = Date.now();
-          const image = await camera.takeSnapshot();
-          const path = `${Dirs.CacheDir}/burst-${burstId.current}-${i}.jpg`;
-          await image.saveToFileAsync(path, 'jpg', 95);
-          return path;
-        },
-        deleteFiles,
-        superResolve: (paths) => superResolve(paths),
-        now: () => Date.now(),
-      }),
-    []
-  );
 
   const busy = status.kind !== 'idle';
   useEffect(() => onBusyChange(busy), [busy, onBusyChange]);
@@ -139,7 +138,12 @@ export default function CameraScreen({
     }
   };
 
-  const device = factory ? getCameraDevice(factory, 'back') : undefined;
+  // hazard: getCameraDevice returns a new object per call; an unmemoized device
+  // makes <Camera> reconfigure its session on every render (preview restarts).
+  const device = useMemo(
+    () => (factory ? getCameraDevice(factory, 'back') : undefined),
+    [factory]
+  );
 
   let body;
   if (!hasPermission && (deniedOnce || !canRequestPermission)) {
