@@ -9,7 +9,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 ---
 
 **Design**: `.specs/features/example-camera-burst/design.md`
-**Status**: Draft
+**Status**: Approved (2026-11-12) — Android-only (iOS deferred by owner); UAT on AVD virtual-scene camera; tools: context7, skill `react-native-expert`, adb
 
 ---
 
@@ -20,8 +20,8 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 | Code Layer | Required Test Type | Coverage Expectation | Location Pattern | Run Command |
 | ---------- | ------------------ | -------------------- | ---------------- | ----------- |
 | Burst logic (`example/src/burst/**`) | unit (Jest, fake deps) | All branches; 1:1 to CAM-03, 04, 05, 06 (outcome data), 10, 11, 13, 14; edge case "next burst uses newly selected N" | `example/src/burst/__tests__/*.test.ts` | `yarn test` |
-| Screens + App switch (`example/src/App.tsx`, `example/src/screens/**`) | manual UAT (Android device) | CAM-01, 02, 06, 07, 08, 09, 10, 11, 12 (code review), 13, 19 (code review); lint + typecheck | — | `yarn example android` |
-| Native config (`example/android/**`, `example/ios/**`, `example/package.json`) | build + static check | Android build passes; manifest/plist keys present (CAM-15, 16, 18) | — | `yarn turbo run build:android`; `grep` |
+| Screens + App switch (`example/src/App.tsx`, `example/src/screens/**`) | manual UAT (Android device) | CAM-01, 02, 06, 07, 08, 09, 10, 11, 12 (code review), 13; lint + typecheck | — | `yarn example android` |
+| Native config (`example/android/**`, `example/ios/**`, `example/package.json`) | build + static check | Android build passes; manifest keys present (CAM-15, 18) | — | `yarn turbo run build:android`; `grep` |
 
 ## Gate Check Commands
 
@@ -81,25 +81,24 @@ T7
 
 ---
 
-### T2: Camera permission, portrait lock and iOS usage string
+### T2: Camera permission and portrait lock (Android)
 
-**What**: Android manifest: `android.permission.CAMERA` + `android:screenOrientation="portrait"` on `MainActivity`. iOS `Info.plist`: non-empty `NSCameraUsageDescription` and `UISupportedInterfaceOrientations~ipad` = portrait only.
-**Where**: `example/android/app/src/main/AndroidManifest.xml`, `example/ios/MeanNSuperResolutionExample/Info.plist` (actual folder name verified at execution)
+**What**: Android manifest: `android.permission.CAMERA` + `android:screenOrientation="portrait"` on `MainActivity`.
+**Where**: `example/android/app/src/main/AndroidManifest.xml`
 **Depends on**: T1
 **Reuses**: —
-**Requirement**: CAM-15 (permission), CAM-16, CAM-18
+**Requirement**: CAM-15 (permission), CAM-18
 
 **Tools**: MCP: NONE · Skill: NONE
 
 **Done when**:
 
 - [ ] `grep` shows `android.permission.CAMERA` and `screenOrientation="portrait"` in the manifest
-- [ ] `grep` shows `NSCameraUsageDescription` with non-empty string, and the iPad orientation array contains only `UIInterfaceOrientationPortrait`
 - [ ] `yarn turbo run build:android --force` exits 0
 
 **Tests**: build + static check
 **Gate**: build
-**Commit**: `chore(example): declare camera permission and lock portrait`
+**Commit**: `chore(example): declare camera permission and lock portrait on android`
 
 ---
 
@@ -153,20 +152,19 @@ T7
 
 ---
 
-### T5: CameraScreen (Android camera + iOS notice)
+### T5: CameraScreen (Android)
 
-**What**: Implement `CameraScreen` per design: iOS notice branch; Android permission gate (request on mount, denied → message + "Open settings"), "No camera available" branch, fixed-size `<Camera>` with ref and `onPreviewStarted`, 5/15/30 picker (default 5), Capture wired to `createBurstRunner` with `takeFrame` = `takeSnapshot` + `saveToFileAsync(path,'jpg',95)` into `Dirs.CacheDir/burst-<id>-<i>.jpg`, `deleteFiles` via `FileSystem.unlink`, status `i/N` / "Processing…", error text, controls + Back disabled while busy, `onBusyChange`, `onResult`, and a `[camera-burst]` console log line on success/failure. Replace the T4 placeholder; App's `BackHandler` honors busy.
+**What**: Implement `CameraScreen` per design (iOS notice branch dropped — iOS out of scope): Android permission gate (request on mount, denied → message + "Open settings"), "No camera available" branch, fixed-size `<Camera>` with ref and `onPreviewStarted`, 5/15/30 picker (default 5), Capture wired to `createBurstRunner` with `takeFrame` = `takeSnapshot` + `saveToFileAsync(path,'jpg',95)` into `Dirs.CacheDir/burst-<id>-<i>.jpg`, `deleteFiles` via `FileSystem.unlink`, status `i/N` / "Processing…", error text, controls + Back disabled while busy, `onBusyChange`, `onResult`, and a `[camera-burst]` console log line on success/failure. Replace the T4 placeholder; App's `BackHandler` honors busy.
 **Where**: `example/src/screens/CameraScreen.tsx`, `example/src/App.tsx`
 **Depends on**: T4
 **Reuses**: `burstRunner` (T3), `react-native-file-access` cleanup pattern from `HomeScreen`
-**Requirement**: CAM-02, 03, 04, 05, 09, 10, 11, 12, 13, 14, 19
+**Requirement**: CAM-02, 03, 04, 05, 09, 10, 11, 12, 13, 14
 
 **Tools**: MCP: context7 (VisionCamera Camera/permission API) · Skill: `react-native-expert`
 
 **Done when**:
 
 - [ ] `yarn lint && yarn typecheck && yarn test` pass (test count unchanged from T3)
-- [ ] No VisionCamera hook is called on the iOS branch (code review)
 
 **Tests**: manual UAT (T7)
 **Gate**: UI
@@ -197,11 +195,11 @@ T7
 
 ### T7: Android device UAT + evidence
 
-**What**: Install the example on an Android device (physical preferred; AVD virtual-scene camera as fallback, stated in evidence) and run every scenario below, saving screenshots and `adb logcat` lines under `.specs/features/example-camera-burst/evidence/`.
+**What**: Install the example on an Android AVD with the virtual-scene back camera (owner choice) and run every scenario below, saving screenshots and `adb logcat` lines under `.specs/features/example-camera-burst/evidence/`.
 **Where**: `.specs/features/example-camera-burst/evidence/**`
 **Depends on**: T6
 **Reuses**: Evidence approach from `opencv-super-resolution` validation
-**Requirement**: CAM-01, 02, 06, 07, 08, 09, 10, 13, 18 (runtime); CAM-12, 19 (code review entries)
+**Requirement**: CAM-01, 02, 06, 07, 08, 09, 10, 13, 18 (runtime); CAM-12 (code review entry)
 
 **Tools**: MCP: NONE · Skill: NONE (adb)
 
@@ -214,7 +212,7 @@ T7
 - [ ] A rejection shown on the camera screen with its `E_*` code and preview not opened (CAM-10); method recorded (e.g. lens covered → featureless)
 - [ ] Rapid double tap on Capture → one burst (single progress sequence in log) (CAM-13)
 - [ ] Device rotated during/after burst → UI stays portrait (CAM-18)
-- [ ] Gaps logged: CAM-12 (no-camera branch) and CAM-19 (iOS) verified by code review only
+- [ ] Gap logged: CAM-12 (no-camera branch) verified by code review only; AVD virtual scene (not a real sensor) stated
 
 **Tests**: manual UAT
 **Gate**: build

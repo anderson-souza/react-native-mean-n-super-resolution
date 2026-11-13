@@ -2,7 +2,7 @@
 
 **Spec**: `.specs/features/example-camera-burst/spec.md`
 **Context**: `.specs/features/example-camera-burst/context.md`
-**Status**: Approved (2026-11-12)
+**Status**: Approved (2026-11-12). Amended 2026-11-12: iOS out of scope (owner): no Info.plist changes, no iOS notice branch; CAM-16/CAM-19 deferred.
 
 ---
 
