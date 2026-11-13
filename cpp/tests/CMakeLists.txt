@@ -24,6 +24,7 @@ enable_testing()
 set(SR_DIR ${CMAKE_CURRENT_LIST_DIR}/../sr)
 add_library(sr_core STATIC
   ${SR_DIR}/Align.cpp
+  ${SR_DIR}/ErrorMapping.cpp
   ${SR_DIR}/Paths.cpp
   ${SR_DIR}/Pipeline.cpp
   ${SR_DIR}/Validate.cpp
@@ -39,6 +40,7 @@ add_executable(sr_tests
   fixtures.cpp
   pipeline_test.cpp
   align_test.cpp
+  error_mapping_test.cpp
 )
 target_link_libraries(sr_tests PRIVATE sr_core GTest::gtest_main)
 

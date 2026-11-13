@@ -211,6 +211,7 @@ T12 → T13
 
 **Tests**: unit · **Gate**: quick (JS) + typecheck/lint
 **Commit**: `feat(api): add superResolve JS API and remove multiply`
+**Status**: ✅ Done (cc82493)
 
 ---
 
@@ -227,6 +228,7 @@ T12 → T13
 
 **Tests**: unit · **Gate**: quick (native)
 **Commit**: `feat(native): add pre-flight memory and input guards`
+**Status**: ✅ Done (21cfa38)
 
 ---
 
@@ -245,6 +247,7 @@ T12 → T13
 
 **Tests**: unit (mapping) + build · **Gate**: quick (native); full after T9
 **Commit**: `feat(native): async superResolve TurboModule method`
+**Status**: ✅ Done — host mapping tests 5/5; codegen structs `NativeMeanNSuperResolutionSuperResolveOptions`/`…SuperResolveResult` (+`…Bridging`) from `example/android/app/build/generated/source/codegen/pureCxx/MeanNSuperResolutionSpec/jni/react/renderer/components/MeanNSuperResolutionSpec/MeanNSuperResolutionSpecJSI.h`; no `cv::Exception` branch (AD-004); Android compile evidence in T9
 
 ---
 
