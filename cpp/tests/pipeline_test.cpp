@@ -87,6 +87,27 @@ TEST(Pipeline, IdenticalFramesDefaultScaleEqualsUpscaledReference) {
   EXPECT_LE(maxDiff, 1.0);
 }
 
+// invariant: SR-CFG-03 — `.jpg` output is JPEG at quality 95; identical frames make
+// the mean equal the upscaled reference, so the encoded bytes are fully determined.
+TEST(Pipeline, JpegOutputIsEncodedAtQuality95) {
+  const auto dir = fixtures::freshDir();
+  auto r = requestFor(identicalFrames(dir), dir);
+  r.outputPath = (dir / "out.jpg").string();
+
+  sr::run(r);
+
+  const cv::Mat ref = cv::imread(r.paths[0], cv::IMREAD_COLOR);
+  const cv::Mat S = (cv::Mat_<double>(2, 3) << 2, 0, 0, 0, 2, 0);
+  cv::Mat expected;
+  cv::warpAffine(ref, expected, S, cv::Size(2 * kW, 2 * kH), cv::INTER_CUBIC, cv::BORDER_REPLICATE);
+  std::vector<uchar> expectedBytes;
+  ASSERT_TRUE(cv::imencode(".jpg", expected, expectedBytes, {cv::IMWRITE_JPEG_QUALITY, 95}));
+
+  const auto got = fixtures::readBytes(*r.outputPath);
+  EXPECT_EQ(got.size(), expectedBytes.size());
+  EXPECT_TRUE(std::equal(got.begin(), got.end(), expectedBytes.begin(), expectedBytes.end()));
+}
+
 TEST(Pipeline, ScaleControlsOutputDimensions) {
   const auto dir = fixtures::freshDir();
   const auto paths = identicalFrames(dir);
