@@ -17,12 +17,16 @@ function setup(overrides: Partial<BurstDeps> = {}) {
   const calls: Call[] = [];
   let burst = 0;
   let clock = 1000;
+  // why: capture and cleanup also advance the clock, so elapsedMs only equals
+  // 250 when timing wraps superResolve alone (CAM-06).
   const takeFrame = jest.fn(async (i: number) => {
     calls.push({ kind: 'take', i });
+    clock += 100;
     return `/cache/burst-${burst}-${i}.jpg`;
   });
   const deleteFiles = jest.fn(async (paths: string[]) => {
     calls.push({ kind: 'delete', paths: [...paths] });
+    clock += 10;
   });
   const superResolve = jest.fn(async (_paths: string[]) => {
     clock += 250;
@@ -84,6 +88,54 @@ describe('burstRunner capture + process', () => {
       expect(outcome?.ok).toBe(true);
     }
   );
+
+  it('reports i/N only after frame i has been captured (CAM-04)', async () => {
+    const log: string[] = [];
+    const runner = createBurstRunner({
+      takeFrame: async (i) => {
+        await Promise.resolve();
+        log.push(`frame${i}`);
+        return `/cache/f${i}.jpg`;
+      },
+      deleteFiles: async () => {},
+      superResolve: async () => srResult,
+      now: () => 0,
+    });
+    await runner.start(5, (e) =>
+      log.push(e.type === 'progress' ? `progress${e.captured}` : e.type)
+    );
+    expect(log).toEqual([
+      'frame0',
+      'progress1',
+      'frame1',
+      'progress2',
+      'frame2',
+      'progress3',
+      'frame3',
+      'progress4',
+      'frame4',
+      'progress5',
+      'processing',
+    ]);
+  });
+
+  it('emits no progress for a frame that failed (CAM-04, CAM-11)', async () => {
+    const events: BurstEvent[] = [];
+    const runner = createBurstRunner({
+      takeFrame: async (i) => {
+        if (i === 2) throw new Error('snapshot failed');
+        return `/cache/f${i}.jpg`;
+      },
+      deleteFiles: async () => {},
+      superResolve: async () => srResult,
+      now: () => 0,
+    });
+    await runner.start(5, (e) => events.push(e));
+    expect(events).toEqual([
+      { type: 'progress', captured: 1, total: 5 },
+      { type: 'progress', captured: 2, total: 5 },
+    ]);
+  });
 
   it('calls superResolve only after the processing event', async () => {
     const order: string[] = [];
