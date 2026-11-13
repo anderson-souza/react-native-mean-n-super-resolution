@@ -3,6 +3,115 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 1,
-  "lessons": []
+  "next_id": 7,
+  "lessons": [
+    {
+      "id": "L-001",
+      "key": "surviving_mutant::when frames can be skipped assert output pixel values on the skip path not only the used frame count",
+      "text": "When frames can be skipped, assert output pixel values on the skip path, not only the used-frame count",
+      "signal": "surviving_mutant",
+      "scope": "native-pipeline",
+      "status": "candidate",
+      "features": [
+        "opencv-super-resolution"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "validation.md M8 cpp/sr/Pipeline.cpp:130 (native-pipeline)"
+      ],
+      "created": "2026-11-13T02:08:31Z",
+      "last_seen": "2026-11-13T02:08:31Z"
+    },
+    {
+      "id": "L-002",
+      "key": "surviving_mutant::assert encoder parameters the spec names such as jpeg quality not only the output file format",
+      "text": "Assert encoder parameters the spec names, such as JPEG quality, not only the output file format",
+      "signal": "surviving_mutant",
+      "scope": "native-pipeline",
+      "status": "candidate",
+      "features": [
+        "opencv-super-resolution"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "validation.md M9 cpp/sr/Pipeline.cpp:43 (native-pipeline)"
+      ],
+      "created": "2026-11-13T02:08:32Z",
+      "last_seen": "2026-11-13T02:08:32Z"
+    },
+    {
+      "id": "L-003",
+      "key": "spec_precision_gap::give every degraded path that changes the output skips fallbacks an acceptance criterion with an exact expected value",
+      "text": "Give every degraded path that changes the output (skips, fallbacks) an acceptance criterion with an exact expected value",
+      "signal": "spec_precision_gap",
+      "scope": "specs",
+      "status": "candidate",
+      "features": [
+        "opencv-super-resolution"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "spec.md Goals / SR-ERR-06 (specs)"
+      ],
+      "created": "2026-11-13T02:08:32Z",
+      "last_seen": "2026-11-13T02:08:32Z"
+    },
+    {
+      "id": "L-004",
+      "key": "spec_precision_gap::name the harness that proves the turbomodule rejection path since host tests do not compile the jsi adapter",
+      "text": "Name the harness that proves the TurboModule rejection path, since host tests do not compile the JSI adapter",
+      "signal": "spec_precision_gap",
+      "scope": "turbomodule",
+      "status": "candidate",
+      "features": [
+        "opencv-super-resolution"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "SR-ERR-08 cpp/MeanNSuperResolutionImpl.cpp:57 (turbomodule)"
+      ],
+      "created": "2026-11-13T02:08:33Z",
+      "last_seen": "2026-11-13T02:08:33Z"
+    },
+    {
+      "id": "L-005",
+      "key": "ac_gap::record platform runtime acs as open evidence gaps until a run on that platform is captured",
+      "text": "Record platform runtime ACs as open evidence gaps until a run on that platform is captured",
+      "signal": "ac_gap",
+      "scope": "platforms",
+      "status": "candidate",
+      "features": [
+        "opencv-super-resolution"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "SR-CORE-06 (platforms)"
+      ],
+      "created": "2026-11-13T02:08:34Z",
+      "last_seen": "2026-11-13T02:08:34Z"
+    },
+    {
+      "id": "L-006",
+      "key": "spec_deviation::confirm a native dependency s exception and abort behavior in the spike before designing on apis that signal failure by throwing",
+      "text": "Confirm a native dependency's exception and abort behavior in the spike before designing on APIs that signal failure by throwing",
+      "signal": "spec_deviation",
+      "scope": "native-deps",
+      "status": "candidate",
+      "features": [
+        "opencv-super-resolution"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "cpp/sr/Align.cpp:8 (T6 SPEC_DEVIATION) (native-deps)"
+      ],
+      "created": "2026-11-13T02:08:34Z",
+      "last_seen": "2026-11-13T02:08:34Z"
+    }
+  ]
 }
