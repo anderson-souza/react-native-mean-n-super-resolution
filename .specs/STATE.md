@@ -44,11 +44,11 @@
 
 ## Handoff
 
-- **Feature**: `.specs/features/opencv-super-resolution`
-- **Phase / Task**: Done — validation PASS (iteration 2, conditional on owner-accepted gaps)
-- **Completed**: T0–T13 + T7b + fix iteration 1 (F1–F4); validation.md ff73d23
+- **Feature**: `.specs/features/example-camera-burst`
+- **Phase / Task**: Done — validation PASS (iteration 2)
+- **Completed**: T1–T7, UAT fixes d3d30e2/859da98, verifier fixes 4c2ef45/defe18f/cdc85a6
 - **In-progress** (file:line): none
-- **Next step**: Owner adds GitHub remote + pushes branch → confirm CI (test-native, build-android NDK r30, build-ios) → iOS device UAT on a Mac → open PR.
-- **Blockers**: none (open evidence gaps: CI never run, iOS build/runtime, EXIF test)
+- **Next step**: Review/merge PR #1 (base `feat/opencv-super-resolution`; retarget to `main` after that branch merges); watch CI
+- **Blockers**: none (notes: CAM-12 code-review only; AVD virtual scene, no real handheld burst; iOS deferred)
 - **Uncommitted files**: none
-- **Branch**: feat/opencv-super-resolution
+- **Branch**: feat/example-camera-burst

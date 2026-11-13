@@ -50,6 +50,24 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: cpp/sr/Align.cpp:8 (T6 SPEC_DEVIATION) (native-deps)
 - last seen: 2026-11-13T02:08:34Z
 
+### L-007 — Advance fake clocks in every async dependency, not only the timed one, so an assertion on elapsed time pins down which span is measured
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `example-burst` · harmful: 0
+- features: example-camera-burst
+- evidence: validation.md M5 (burstRunner.ts:36) (example-burst)
+- last seen: 2026-11-13T21:09:32Z
+
+### L-008 — When the spec orders events relative to dependency calls, record both in one log and assert their interleaving
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `example-burst` · harmful: 0
+- features: example-camera-burst
+- evidence: validation.md M6 (burstRunner.ts:32), CAM-04 (example-burst)
+- last seen: 2026-11-13T21:09:32Z
+
+### L-009 — Name the exact on-screen text or control for UI acceptance criteria instead of verbs like show a message or let the user compare
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `specs` · harmful: 0
+- features: example-camera-burst
+- evidence: CAM-07, CAM-09 (specs)
+- last seen: 2026-11-13T21:09:32Z
+
 ## Quarantined (failed when applied — ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.
