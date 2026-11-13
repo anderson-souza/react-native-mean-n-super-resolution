@@ -39,6 +39,16 @@ async function copyFrame(asset: ImageSourcePropType, dest: string) {
   }
 }
 
+async function copyFrames(): Promise<string[]> {
+  return Promise.all(
+    FRAMES.map(async (asset, i) => {
+      const dest = `${Dirs.CacheDir}/sr-frame${i}.png`;
+      await copyFrame(asset, dest);
+      return dest;
+    })
+  );
+}
+
 type Run = {
   result: SuperResolveResult;
   elapsedMs: number;
@@ -51,6 +61,7 @@ export default function App() {
   const [busy, setBusy] = useState(false);
   const [run, setRun] = useState<Run | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [check, setCheck] = useState<string | null>(null);
 
   // why: JS heartbeat; it keeps counting while superResolve runs only if the
   // native work is off the JS thread (SR-CORE-05).
@@ -67,13 +78,7 @@ export default function App() {
     setError(null);
     setRun(null);
     try {
-      const paths = await Promise.all(
-        FRAMES.map(async (asset, i) => {
-          const dest = `${Dirs.CacheDir}/sr-frame${i}.png`;
-          await copyFrame(asset, dest);
-          return dest;
-        })
-      );
+      const paths = await copyFrames();
       const startTicks = ticksRef.current;
       const start = Date.now();
       const result = await superResolve(paths);
@@ -93,6 +98,40 @@ export default function App() {
     }
   };
 
+  // why: device evidence that native SrError codes reach JS (SR-ERR-04/08) and
+  // that concurrent default outputs get distinct files (SR-CORE-07).
+  const runCheck = async (name: string, body: () => Promise<string>) => {
+    setBusy(true);
+    setCheck(null);
+    let line: string;
+    try {
+      line = await body();
+    } catch (e) {
+      line = `rejected: ${e instanceof Error ? e.message : String(e)}`;
+    }
+    console.log(`[superResolve:${name}] ${line}`);
+    setCheck(`${name}: ${line}`);
+    setBusy(false);
+  };
+
+  const onMissingFile = () =>
+    runCheck('missing-file', async () => {
+      const paths = await copyFrames();
+      paths[2] = `${Dirs.CacheDir}/does-not-exist.png`;
+      const result = await superResolve(paths);
+      return `unexpectedly resolved ${result.path}`;
+    });
+
+  const onConcurrent = () =>
+    runCheck('concurrent', async () => {
+      const paths = await copyFrames();
+      const [a, b] = await Promise.all([
+        superResolve(paths),
+        superResolve(paths),
+      ]);
+      return `${a.path === b.path ? 'SAME' : 'distinct'} ${a.path} ${b.path}`;
+    });
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>superResolve demo</Text>
@@ -103,6 +142,21 @@ export default function App() {
         disabled={busy}
       />
       <Text>Input: 5 × 640×480 PNG</Text>
+      <Button
+        title="Check: missing file"
+        onPress={onMissingFile}
+        disabled={busy}
+      />
+      <Button
+        title="Check: 2 concurrent calls"
+        onPress={onConcurrent}
+        disabled={busy}
+      />
+      {check && (
+        <Text testID="check" selectable style={styles.path}>
+          {check}
+        </Text>
+      )}
       {run && (
         <View style={styles.result}>
           <Text testID="dims">
