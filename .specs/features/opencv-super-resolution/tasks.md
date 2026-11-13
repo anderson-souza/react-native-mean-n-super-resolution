@@ -280,7 +280,7 @@ T12 → T13
 
 **Tests**: build · **Gate**: full (CI)
 **Commit**: `build(ios): vendor opencv-mobile xcframework via podspec`
-**Status**: ⚠️ Partial — CI pending (no remote). Local: `npm pack --dry-run` lists `opencv.json`, `cmake/OpenCVMobile.cmake`, `ios/TempDir.mm`, no `.opencv/`; podspec Ruby syntax NOT checked (no `ruby` on host); iOS build/runtime unverified (no Mac)
+**Status**: ⚠️ Partial (cbe3ac7) — CI pending (no remote). Local: `npm pack --dry-run` lists `opencv.json`, `cmake/OpenCVMobile.cmake`, `ios/TempDir.mm`, no `.opencv/`; podspec Ruby syntax NOT checked (no `ruby` on host); iOS build/runtime unverified (no Mac)
 
 ---
 
@@ -297,6 +297,7 @@ T12 → T13
 
 **Tests**: none (CI config) · **Gate**: build
 **Commit**: `ci: run native tests and cache opencv-mobile`
+**Status**: ⚠️ Partial — CI pending (no remote); `ci.yml` parses (jobs: lint, test, test-native, build-library, build-android, build-ios); local Phase 3 build gate passed (jest 43, native 44, prepare OK)
 
 ---
 
