@@ -3,9 +3,9 @@
 ## Decisions
 
 ### AD-001
-- **Decision**: All native logic (including future OpenCV super-resolution code) lives in shared C++ under `cpp/`, exposed as a pure C++ TurboModule; no Kotlin/Swift/Obj-C module code.
+- **Decision**: All native logic (including future OpenCV super-resolution code) lives in shared C++ under `cpp/`, exposed as a pure C++ TurboModule; no Kotlin/Swift/Obj-C module code. *(Amended 2026-11-15, see AD-006: a thin Java + JNI adapter for the Android Old Architecture is allowed; it holds no processing logic.)*
 - **Reason**: Project scaffolded as `turbo-module` + `cpp` (create-react-native-library 0.64.0); one implementation compiles for both iOS (podspec + `ios/OnLoad.mm`) and Android (`android/CMakeLists.txt` via `react-native.config.js`).
-- **Trade-off**: New Architecture only; platform-specific APIs (e.g. image decoding from Photos/content URIs) need C++ bridging or must be handled in JS before calling the module.
+- **Trade-off**: New Architecture only on iOS; Android Old Architecture via AD-006; platform-specific APIs (e.g. image decoding from Photos/content URIs) need C++ bridging or must be handled in JS before calling the module.
 - **Scope**: All features; `cpp/`, `ios/`, `android/`, `src/Native*.ts`.
 - **Date**: 2026-11-11
 - **Status**: active
@@ -40,6 +40,14 @@
 - **Trade-off**: Extra install step (`ndkVersion` in app `android/build.gradle`); NDK bumps must track opencv-mobile releases.
 - **Scope**: Android build, README install docs, CI build-android.
 - **Date**: 2026-11-12
+- **Status**: active
+
+### AD-006
+- **Decision**: Android is dual-arch via a Gradle library module (`android/build.gradle`) switched by the `newArchEnabled` Gradle property: New Arch runs codegen and keeps the C++ TurboModule (package registers no Java module); Old Arch builds `libmeannsuperresolution.so` (shared `cpp/sr` + JNI adapter, `c++_static`, no fbjni/RN native deps) behind a Java `ReactContextBaseJavaModule`. JS uses `TurboModuleRegistry.get` and rejects `E_INTERNAL` when nothing is linked. iOS stays New Architecture only. Supported Old Arch floor: RN 0.71 (tested on 0.72.x via standalone `example-legacy/`).
+- **Reason**: Important consumer app is RN 0.71–0.72 Android Old Arch (owner, 2026-11-15); Gradle module is the ecosystem convention and respects `-PnewArchEnabled`; static libc++ avoids RN 0.72's NDK-23 `libc++_shared.so`, which lacks symbols opencv-mobile v38 needs (AD-005).
+- **Trade-off**: Library is no longer a pure-C++ autolinking dependency on New Arch (codegen path instead); second CMake target and Java code to maintain; no automated JVM unit tests (emulator UAT only).
+- **Scope**: `android/`, `src/NativeMeanNSuperResolution.ts`, `src/superResolve.native.ts`, `react-native.config.js`, `example-legacy/`, CI.
+- **Date**: 2026-11-15
 - **Status**: active
 
 ## Handoff
