@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 7,
+  "next_id": 10,
   "lessons": [
     {
       "id": "L-001",
@@ -112,6 +112,60 @@
       ],
       "created": "2026-11-13T02:08:34Z",
       "last_seen": "2026-11-13T02:08:34Z"
+    },
+    {
+      "id": "L-007",
+      "key": "surviving_mutant::advance fake clocks in every async dependency not only the timed one so an assertion on elapsed time pins down which span is measured",
+      "text": "Advance fake clocks in every async dependency, not only the timed one, so an assertion on elapsed time pins down which span is measured",
+      "signal": "surviving_mutant",
+      "scope": "example-burst",
+      "status": "candidate",
+      "features": [
+        "example-camera-burst"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "validation.md M5 (burstRunner.ts:36) (example-burst)"
+      ],
+      "created": "2026-11-13T21:09:32Z",
+      "last_seen": "2026-11-13T21:09:32Z"
+    },
+    {
+      "id": "L-008",
+      "key": "surviving_mutant::when the spec orders events relative to dependency calls record both in one log and assert their interleaving",
+      "text": "When the spec orders events relative to dependency calls, record both in one log and assert their interleaving",
+      "signal": "surviving_mutant",
+      "scope": "example-burst",
+      "status": "candidate",
+      "features": [
+        "example-camera-burst"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "validation.md M6 (burstRunner.ts:32), CAM-04 (example-burst)"
+      ],
+      "created": "2026-11-13T21:09:32Z",
+      "last_seen": "2026-11-13T21:09:32Z"
+    },
+    {
+      "id": "L-009",
+      "key": "spec_precision_gap::name the exact on screen text or control for ui acceptance criteria instead of verbs like show a message or let the user compare",
+      "text": "Name the exact on-screen text or control for UI acceptance criteria instead of verbs like show a message or let the user compare",
+      "signal": "spec_precision_gap",
+      "scope": "specs",
+      "status": "candidate",
+      "features": [
+        "example-camera-burst"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "CAM-07, CAM-09 (specs)"
+      ],
+      "created": "2026-11-13T21:09:32Z",
+      "last_seen": "2026-11-13T21:09:32Z"
     }
   ]
 }
