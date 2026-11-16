@@ -117,3 +117,15 @@ dependencies {
         implementation jscFlavor
     }
 }
+
+// hazard: @react-native/gradle-plugin 0.88.0 writes the pure C++ codegen dir into
+// Android-autolinking.cmake with Windows backslashes, so `\"` escapes the closing
+// quote and CMake configure fails on Windows hosts. Normalizing to `/` is a no-op
+// on macOS/Linux. Remove once the upstream plugin emits forward slashes.
+tasks.matching { it.name == "generateAutolinkingNewArchitectureFiles" }.configureEach { task ->
+    task.doLast {
+        def cmake = new File(task.generatedOutputDirectory.get().asFile, "Android-autolinking.cmake")
+        // invariant: `\ ` (the plugin's escaped space) is kept; every other `\` is a path separator.
+        cmake.text = cmake.text.replaceAll(/\\(?! )/, '/')
+    }
+}

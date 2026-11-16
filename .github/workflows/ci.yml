@@ -44,6 +44,25 @@ jobs:
       - name: Run unit tests
         run: yarn test --maxWorkers=2 --coverage
 
+  test-native:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup
+        uses: ./.github/actions/setup
+
+      - name: Cache opencv-mobile
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .opencv
+          key: ${{ runner.os }}-opencv-native-${{ hashFiles('opencv.json') }}
+
+      - name: Run native tests
+        run: yarn test:native
+
   build-library:
     runs-on: ubuntu-latest
 
@@ -97,6 +116,8 @@ jobs:
         if: env.turbo_cache_hit != 1
         run: |
           /bin/bash -c "yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses > /dev/null"
+          # why: opencv-mobile v38 needs NDK r30+; pin the version example/android/build.gradle uses.
+          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "ndk;30.0.14904198" > /dev/null
 
 
       - name: Cache Gradle
@@ -109,6 +130,13 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('example/android/gradle/wrapper/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
+
+      - name: Cache opencv-mobile
+        if: env.turbo_cache_hit != 1
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .opencv
+          key: ${{ runner.os }}-opencv-android-${{ hashFiles('opencv.json') }}
 
       - name: Build example for Android
         env:
@@ -153,6 +181,13 @@ jobs:
         uses: maxim-lobanov/setup-xcode@ed7a3b1fda3918c0306d1b724322adc0b8cc0a90 # v1.7.0
         with:
           xcode-version: ${{ env.XCODE_VERSION }}
+
+      - name: Cache opencv-mobile
+        if: env.turbo_cache_hit != 1
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .opencv
+          key: ${{ runner.os }}-opencv-ios-${{ hashFiles('opencv.json') }}
 
       - name: Install cocoapods
         if: env.turbo_cache_hit != 1
