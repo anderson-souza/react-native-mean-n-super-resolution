@@ -101,11 +101,24 @@ T9 → T10 → T11
 
 **Done when**:
 
-- [ ] `android/CMakeLists.txt` has no inline NDK check
-- [ ] Android New Arch gate passes (NDK r30)
-- [ ] With `ndkVersion` set to `29.0.14206865` in a throwaway local edit, configure fails with the unchanged message (output captured in task notes, edit reverted)
+- [x] `android/CMakeLists.txt` has no inline NDK check
+- [x] Android New Arch gate passes (NDK r30)
+- [x] With `ndkVersion` set to `29.0.14206865` in a throwaway local edit, configure fails with the unchanged message (output captured in task notes, edit reverted)
 
-**Tests**: build · **Gate**: Android New Arch
+**Tests**: build · **Gate**: Android New Arch · **Status**: ✅ Done
+
+**Notes (T2)**: `example/android` `gradlew.bat assembleDebug` (NDK r30) → BUILD SUCCESSFUL. Throwaway `ndkVersion = "29.0.14206865"` + `app:assembleDebug -PreactNativeArchitectures=x86_64` → `:app:configureCMakeDebug[x86_64] FAILED`:
+
+```
+CMake Error at D:/repos/rn-mean-n-super-resolution/cmake/RequireNdk.cmake:13 (message):
+  react-native-mean-n-super-resolution requires Android NDK r30+ (found
+  'Pkg.Revision = 29.0.14206865' in
+  C:/Users/ander/AppData/Local/Android/sdk/ndk/29.0.14206865).  Set
+  ndkVersion = "30.0.14904198" (or newer) in your app's android/build.gradle
+  ext block.
+```
+
+Edit reverted (`git checkout -- example/android/build.gradle`).
 **Commit**: `refactor(android): move NDK floor check to cmake/RequireNdk.cmake`
 
 ---
