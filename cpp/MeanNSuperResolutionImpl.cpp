@@ -3,26 +3,13 @@
 #include "platform/TempDir.h"
 #include "sr/ErrorMapping.h"
 #include "sr/Pipeline.h"
+#include "sr/Scale.h"
 
-#include <cmath>
 #include <exception>
 #include <thread>
 #include <utility>
 
 namespace facebook::react {
-
-namespace {
-
-// invariant: a non-integral or non-finite scale maps to 0, which sr::validate
-// rejects with E_INVALID_ARGUMENT like any other out-of-range value.
-int toScale(const std::optional<double>& scale) {
-  if (!scale) return 2;
-  const double v = *scale;
-  if (!std::isfinite(v) || v != std::trunc(v) || v < -1e6 || v > 1e6) return 0;
-  return static_cast<int>(v);
-}
-
-}
 
 MeanNSuperResolutionImpl::MeanNSuperResolutionImpl(
   std::shared_ptr<CallInvoker> jsInvoker
@@ -38,7 +25,7 @@ AsyncPromise<SuperResolveResult> MeanNSuperResolutionImpl::superResolve(
 
   sr::Request request;
   request.paths = std::move(paths);
-  request.scale = toScale(options.scale);
+  request.scale = sr::toScale(options.scale);
   request.outputPath = std::move(options.outputPath);
 
   // invariant: the worker owns copies of the request and promise and never

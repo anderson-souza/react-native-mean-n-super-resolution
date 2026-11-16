@@ -80,11 +80,11 @@ T9 → T10 → T11
 
 **Done when**:
 
-- [ ] Tests assert: `nullopt → 2`; `1,2,3,4 → same`; `2.5 → 0`; `NaN, ±inf → 0`; `±1e7 → 0`; `-1 → -1`
-- [ ] Impl has no local `toScale`
-- [ ] Gate: `yarn test:native` passes, 46 + new tests (no deletions)
+- [x] Tests assert: `nullopt → 2`; `1,2,3,4 → same`; `2.5 → 0`; `NaN, ±inf → 0`; `±1e7 → 0`; `-1 → -1`
+- [x] Impl has no local `toScale`
+- [x] Gate: `yarn test:native` passes, 46 + new tests (no deletions)
 
-**Tests**: unit · **Gate**: quick native
+**Tests**: unit · **Gate**: quick native · **Status**: ✅ Done (52/52 native)
 **Commit**: `refactor(cpp): share scale conversion in sr/Scale.h`
 
 ---

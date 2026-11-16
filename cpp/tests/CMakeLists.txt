@@ -41,6 +41,7 @@ add_executable(sr_tests
   pipeline_test.cpp
   align_test.cpp
   error_mapping_test.cpp
+  scale_test.cpp
 )
 target_link_libraries(sr_tests PRIVATE sr_core GTest::gtest_main)
 
